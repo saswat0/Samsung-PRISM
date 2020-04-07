@@ -1,6 +1,5 @@
 # AdaMatting
-an unofficial pytorch implementation of ICCV 2019 paper "Disentangled Image Matting"  
-this project is not finished
+"Disentangled Image Matting"  for Samsung PRISM Project
 
 ## Dependencies
 + python 3.6  
@@ -33,8 +32,3 @@ $ bash ./train.sh
 ```bash
 $ tensorboard --logdir ./runs
 ```
-### Test
-TODO
-
-## Results and trained model
-TODO
