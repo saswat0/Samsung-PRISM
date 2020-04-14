@@ -242,17 +242,3 @@ def gen_train_valid_names(valid_portion, logger):
     with open('dataset/train_names.txt', 'w') as file:
         file.write('\n'.join(train_names))
     logger.info("Generated train/valid name files")
-
-
-def gen_test_names():
-    num_fgs = 50
-    num_bgs_per_fg = 20
-
-    names = []
-    bcount = 0
-    for fcount in range(num_fgs):
-        for _ in range(num_bgs_per_fg):
-            names.append(str(fcount) + '_' + str(bcount) + '.png')
-            bcount += 1
-
-    return names
