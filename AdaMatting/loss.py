@@ -14,18 +14,17 @@ def alpha_estimation_loss(pred_alpha, gt_alpha, pred_trimap_argmax):
     1: unknown
     2: foreground
     """
-    mask = (pred_trimap_argmax == 1)
-    mask = mask.float()
-    num_unknown_pixel = torch.sum(mask)
-    masked_pred_alpha = pred_alpha.mul(mask)
-    masked_gt_alpha = gt_alpha.mul(mask)
-
-    loss = nn.L1Loss()
-    return loss(masked_pred_alpha, masked_gt_alpha) / (num_unknown_pixel + 1e-8)
+    mask = torch.zeros(pred_trimap_argmax.shape).cuda()
+    mask[pred_trimap_argmax == 1] = 1.
+    mask = mask.unsqueeze(dim=1)
+    diff = (pred_alpha - gt_alpha + 1e-12).mul(mask)
+    return torch.abs(diff).sum() / (mask.sum() + 1.)
 
 
 def task_uncertainty_loss(pred_trimap, pred_trimap_argmax, pred_alpha, gt_trimap, gt_alpha, log_sigma_t_sqr, log_sigma_a_sqr):
+    log_sigma_t_sqr = log_sigma_t_sqr.mean()
+    log_sigma_a_sqr = log_sigma_a_sqr.mean()
     Lt = trimap_adaptation_loss(pred_trimap, gt_trimap)
     La = alpha_estimation_loss(pred_alpha, gt_alpha, pred_trimap_argmax)
-    overall = 1e2 * Lt / (2 * torch.exp(log_sigma_t_sqr)) + 1e8 * La / torch.exp(log_sigma_a_sqr) + (log_sigma_t_sqr + log_sigma_a_sqr) / 2
+    overall = 5e1 * Lt / (2 * torch.exp(log_sigma_t_sqr)) + 5e1 * La / torch.exp(log_sigma_a_sqr) + (log_sigma_t_sqr + log_sigma_a_sqr) / 2
     return overall, Lt, La

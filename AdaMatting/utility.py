@@ -2,39 +2,63 @@ import torch
 import argparse
 import logging
 import numpy as np
+import cv2 as cv
 
 
-def save_checkpoint(epoch, model, optimizer, cur_iter, max_iter, init_lr, cur_lr, loss, is_best, ckpt_path):
-    state = {'epoch': epoch,
-             'model': model,
-             'optimizer': optimizer,
-             'cur_iter': cur_iter,
-             'max_iter': max_iter,
-             'best_loss': loss,
-             'init_lr': init_lr,
-             'cur_lr': cur_lr}
-    filename = ckpt_path + "ckpt.tar"
-    torch.save(state, filename)
-    # If this checkpoint is the best so far, store a copy so it doesn't get overwritten by a worse checkpoint
-    if is_best:
-        filename = ckpt_path + "ckpt_best.tar"
-        torch.save(state, filename)
+def gen_test_names():
+    num_fgs = 50
+    num_bgs_per_fg = 20
+
+    names = []
+    bcount = 0
+    for fcount in range(num_fgs):
+        for _ in range(num_bgs_per_fg):
+            names.append(str(fcount) + '_' + str(bcount) + '.png')
+            bcount += 1
+
+    return names
 
 
-def poly_lr_scheduler(optimizer, init_lr, last_lr, cur_iter, max_iter=100, power=0.9):
-    """Polynomial decay of learning rate
-        :param init_lr is base learning rate
-        :param iter is a current iteration
-        :param max_iter is number of maximum iterations
-        :param power is a polymomial power
+def save_checkpoint(ckpt_path, is_best, is_alpha_best, logger, model, optimizer, epoch, cur_iter, peak_lr, best_loss, best_alpha_loss):
+    state = {"state_dict": model.module.state_dict(),
+             'optimizer': optimizer.state_dict(),
+             "epoch": epoch,
+             "cur_iter": cur_iter,
+             "peak_lr": peak_lr,
+             "best_loss": best_loss,
+             "best_alpha_loss": best_alpha_loss}
+    ckpt_fn = ckpt_path + "ckpt.tar"
+    torch.save(state, ckpt_fn)
+    logger.info("Checkpoint saved")
+    # if is_best:
+    #     ckpt_fn = ckpt_path + "ckpt_best.tar"
+    #     torch.save(state, ckpt_fn)
+    #     logger.info("Best checkpoint saved")
+    if is_alpha_best:
+        ckpt_fn = ckpt_path + "ckpt_best_alpha.tar"
+        torch.save(state, ckpt_fn)
+        logger.info("Best alpha loss checkpoint saved")
 
-    """
-    if cur_iter >= max_iter:
-        return last_lr
-    
-    lr = init_lr * ((1 - cur_iter / max_iter) ** power)
+
+# def lr_scheduler(optimizer, cur_iter, peak_lr, end_lr, decay_iters, decay_power, power):
+#     if cur_iter != 0 and cur_iter % decay_iters == 0:
+#         peak_lr = peak_lr * decay_power
+
+#     cycle_iter = cur_iter % decay_iters
+#     lr = (peak_lr - end_lr) * ((1 - cycle_iter / decay_iters) ** power) + end_lr
+
+#     for param_group in optimizer.param_groups:
+#         param_group['lr'] = lr
+
+#     return lr, peak_lr
+
+
+def lr_scheduler(optimizer, init_lr, cur_iter, max_iter, max_decay_times, decay_rate):
+    lr = init_lr * decay_rate ** (cur_iter / max_iter * max_decay_times)
+
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
+    
     return lr
 
 
@@ -59,14 +83,17 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-def compute_mse(pred, alpha, trimap):
-    num_pixels = float((trimap == 128).sum())
-    return ((pred - alpha) ** 2).sum() / num_pixels
-
-
 def compute_sad(pred, alpha):
-    diff = np.abs(pred - alpha)
+    pred = pred[0, 0, :, :].cpu().numpy()
+    print(pred.shape, alpha.shape)
+    diff = np.abs(pred - alpha / 255)
     return np.sum(diff) / 1000
+
+
+def compute_mse(pred, alpha, trimap):
+    pred = pred[0, 0, :, :].cpu().numpy()
+    num_pixels = float((trimap == 128).sum())
+    return ((pred - alpha / 255) ** 2).sum() / num_pixels
 
 
 def get_args():
@@ -77,13 +104,14 @@ def get_args():
     parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
     parser.add_argument('--epochs', type=int, default=20, help='number of epochs to train for')
     parser.add_argument('--lr', type=float, default=0.001, help='Learning Rate. Default=0.01')
+    parser.add_argument('--decay_iters', type=int, help="Number of iterations every lr decay")
     parser.add_argument('--cuda', action='store_true', default=False, help='use cuda?')
     parser.add_argument('--gpu', type=str, default="0", help="choose gpus")
     parser.add_argument('--write_log', action="store_true", default=False, help="whether store log to log.txt")
     parser.add_argument('--raw_data_path', type=str, default="/data/datasets/im/AdaMatting/", help="dir where datasets are stored")
     parser.add_argument('--ckpt_path', type=str, default="./ckpts/", help="path to the saved checkpoint file")
     parser.add_argument('--save_ckpt', action="store_true", default=False, help="whether save checkpoint every epoch")
-    parser.add_argument('--resume', action="store_true", default=False, help="whether resume training from a ckpt")
+    parser.add_argument('--resume', type=str, default="", help="whether resume training from a ckpt")
     args = parser.parse_args()
     return args
 
@@ -91,7 +119,7 @@ def get_args():
 def get_logger(flag):
     logger = logging.getLogger("AdaMatting")
     logger.setLevel(level=logging.INFO)
-    formatter = logging.Formatter("[%(asctime)s] %(lineno)d: %(levelname)s - %(message)s")
+    formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
 
     # log file stream
     if (flag):
