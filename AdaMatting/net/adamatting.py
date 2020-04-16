@@ -38,20 +38,20 @@ class AdaMatting(nn.Module):
         
         # Shortcuts
         self.shortcut_shallow = GCN(64, 64)
-        self.shortcut_middle = GCN(64 * Bottleneck.expansion, 128)
-        self.shortcut_deep = GCN(128 * Bottleneck.expansion, 256)
+        self.shortcut_middle = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        self.shortcut_deep = GCN(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
 
         # T-decoder
         self.t_decoder_upscale1 = nn.Sequential(
-            nn.Conv2d(256 * Bottleneck.expansion, 256 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(256 * Bottleneck.expansion, 512 * 4, kernel_size=3, stride=1, padding=1, bias=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale2 = nn.Sequential(
-            nn.Conv2d(256, 128 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(512, 256 * 4, kernel_size=3, stride=1, padding=1, bias=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale3 = nn.Sequential(
-            nn.Conv2d(128, 64 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(256, 64 * 4, kernel_size=3, stride=1, padding=1, bias=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale4 = nn.Sequential(
@@ -61,15 +61,15 @@ class AdaMatting(nn.Module):
 
         # A-deocder
         self.a_decoder_upscale1 = nn.Sequential(
-            nn.Conv2d(256 * Bottleneck.expansion, 256 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(256 * Bottleneck.expansion, 512 * 4, kernel_size=3, stride=1, padding=1, bias=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale2 = nn.Sequential(
-            nn.Conv2d(256, 128 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(512, 256 * 4, kernel_size=3, stride=1, padding=1, bias=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale3 = nn.Sequential(
-            nn.Conv2d(128, 64 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(256, 64 * 4, kernel_size=3, stride=1, padding=1, bias=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale4 = nn.Sequential(
@@ -100,18 +100,18 @@ class AdaMatting(nn.Module):
         encoder_deep = self.encoder_resblock2(encoder_middle) # 512
         encoder_result = self.encoder_resblock3(encoder_deep) # 1024
 
-        shortcut_deep = self.shortcut_deep(encoder_deep) # 256
-        shortcut_middle = self.shortcut_middle(encoder_middle) # 128
+        shortcut_deep = self.shortcut_deep(encoder_deep) # 512
+        shortcut_middle = self.shortcut_middle(encoder_middle) # 256
         shortcut_shallow = self.shortcut_shallow(encoder_shallow) # 64
 
-        t_decoder_deep = self.t_decoder_upscale1(encoder_result) + shortcut_deep # 256
-        t_decoder_middle = self.t_decoder_upscale2(t_decoder_deep) + shortcut_middle # 128
+        t_decoder_deep = self.t_decoder_upscale1(encoder_result) + shortcut_deep # 512
+        t_decoder_middle = self.t_decoder_upscale2(t_decoder_deep) + shortcut_middle # 256
         t_decoder_shallow = self.t_decoder_upscale3(t_decoder_middle) # 64
         trimap_adaption = self.t_decoder_upscale4(t_decoder_shallow) # 3
         t_argmax = trimap_adaption.argmax(dim=1)
 
-        a_decoder_deep = self.a_decoder_upscale1(encoder_result) # 256
-        a_decoder_middle = self.a_decoder_upscale2(a_decoder_deep) + shortcut_middle # 128
+        a_decoder_deep = self.a_decoder_upscale1(encoder_result) # 512
+        a_decoder_middle = self.a_decoder_upscale2(a_decoder_deep) + shortcut_middle # 256
         a_decoder_shallow = self.a_decoder_upscale3(a_decoder_middle) + shortcut_shallow # 64
         a_decoder = self.a_decoder_upscale4(a_decoder_shallow) # 1
 

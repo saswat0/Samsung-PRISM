@@ -21,7 +21,7 @@ def train(args, logger, device_ids):
 
     logger.info("Loading network")
     model = AdaMatting(in_channel=4)
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=0)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.0001)
     if args.resume != "":
         ckpt = torch.load(args.resume)
         # for key, _ in ckpt.items():
@@ -335,7 +335,7 @@ def main():
         test(args=args, logger=logger, device_ids=device_ids)
     elif args.mode == "prep":
         logger.info("Program runs in prep mode")
-        # composite_dataset(args.raw_data_path, logger)
+        composite_dataset(args.raw_data_path, logger)
         gen_train_valid_names(args.valid_portion, logger)
 
 

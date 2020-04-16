@@ -30,10 +30,10 @@ def save_checkpoint(ckpt_path, is_best, is_alpha_best, logger, model, optimizer,
     ckpt_fn = ckpt_path + "ckpt.tar"
     torch.save(state, ckpt_fn)
     logger.info("Checkpoint saved")
-    # if is_best:
-    #     ckpt_fn = ckpt_path + "ckpt_best.tar"
-    #     torch.save(state, ckpt_fn)
-    #     logger.info("Best checkpoint saved")
+    if is_best:
+        ckpt_fn = ckpt_path + "ckpt_best_overall.tar"
+        torch.save(state, ckpt_fn)
+        logger.info("Best checkpoint saved")
     if is_alpha_best:
         ckpt_fn = ckpt_path + "ckpt_best_alpha.tar"
         torch.save(state, ckpt_fn)
