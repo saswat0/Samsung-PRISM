@@ -32,3 +32,8 @@ $ bash ./train.sh
 ```bash
 $ tensorboard --logdir ./runs
 ```
+
+### Current Performance and logs
+Trained on 60 epochs
+SAD - 88.0
+MSE - 0.013 on Adobe-1k Composition dataset
