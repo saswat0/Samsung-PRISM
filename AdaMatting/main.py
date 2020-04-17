@@ -56,7 +56,7 @@ def train(args, logger, device_ids):
         cur_iter = ckpt["cur_iter"]
         peak_lr = ckpt["peak_lr"]
         best_loss = ckpt["best_loss"]
-        best_alpha_loss = float('inf')
+        best_alpha_loss = ckpt["best_alpha_loss"]
     else:
         logger.info("Start training from scratch")
         start_epoch = 0
@@ -75,22 +75,23 @@ def train(args, logger, device_ids):
         # Training
         torch.set_grad_enabled(True)
         model.train()
-        for index, (img, gt) in enumerate(train_loader):
+        for index, (_, inputs, gts) in enumerate(train_loader):
             # cur_lr, peak_lr = lr_scheduler(optimizer=optimizer, cur_iter=cur_iter, peak_lr=peak_lr, end_lr=0.000001, 
             #                                decay_iters=args.decay_iters, decay_power=0.8, power=0.5)
             cur_lr = lr_scheduler(optimizer=optimizer, init_lr=args.lr, cur_iter=cur_iter, max_iter=max_iter, 
                                   max_decay_times=45, decay_rate=0.9)
             
-            img = img.type(torch.FloatTensor).to(device) # [bs, 4, 320, 320]
-            gt_alpha = (gt[:, 0, :, :].unsqueeze(1)).type(torch.FloatTensor).to(device) # [bs, 1, 320, 320]
-            gt_trimap = gt[:, 1, :, :].type(torch.LongTensor).to(device) # [bs, 320, 320]
+            # img = img.type(torch.FloatTensor).to(device) # [bs, 4, 320, 320]
+            inputs = inputs.to(device)
+            gt_alpha = (gts[:, 0, :, :].unsqueeze(1)).type(torch.FloatTensor).to(device) # [bs, 1, 320, 320]
+            gt_trimap = gts[:, 1, :, :].type(torch.LongTensor).to(device) # [bs, 320, 320]
 
             optimizer.zero_grad()
-            trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(img)
+            trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(inputs)
 
             L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, pred_trimap_argmax=t_argmax, 
-                                                        pred_alpha=alpha_estimation, gt_trimap=gt_trimap, 
-                                                        gt_alpha=gt_alpha, log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
+                                                        pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
+                                                        log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
             sigma_t, sigma_a = torch.exp(log_sigma_t_sqr.mean() / 2), torch.exp(log_sigma_a_sqr.mean() / 2)
 
@@ -115,7 +116,7 @@ def train(args, logger, device_ids):
                 avg_lo.reset()
                 avg_lt.reset()
                 avg_la.reset()
-            
+                
             cur_iter += 1
             tensorboard_iter = cur_iter * (args.batch_size / 16)
         
@@ -128,28 +129,42 @@ def train(args, logger, device_ids):
         torch.set_grad_enabled(False)
         model.eval()
         with tqdm(total=len(valid_loader)) as pbar:
-            for index, (img, gt) in enumerate(valid_loader):
-                img = img.type(torch.FloatTensor).to(device) # [bs, 4, 320, 320]
-                gt_alpha = (gt[:, 0, :, :].unsqueeze(1)).type(torch.FloatTensor).to(device) # [bs, 1, 320, 320]
-                gt_trimap = gt[:, 1, :, :].type(torch.LongTensor).to(device) # [bs, 320, 320]
+            for index, (display_rgb, inputs, gts) in enumerate(valid_loader):
+                inputs = inputs.to(device) # [bs, 4, 320, 320]
+                gt_alpha = (gts[:, 0, :, :].unsqueeze(1)).type(torch.FloatTensor).to(device) # [bs, 1, 320, 320]
+                gt_trimap = gts[:, 1, :, :].type(torch.LongTensor).to(device) # [bs, 320, 320]
 
-                trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(img)
+                trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(inputs)
                 L_overall_valid, L_t_valid, L_a_valid = task_uncertainty_loss(pred_trimap=trimap_adaption, pred_trimap_argmax=t_argmax, 
-                                                            pred_alpha=alpha_estimation, gt_trimap=gt_trimap, 
-                                                            gt_alpha=gt_alpha, log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
-
-                # L_overall_valid, L_t_valid, L_a_valid = L_overall_valid.mean(), L_t_valid.mean(), L_a_valid.mean()
+                                                            pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
+                                                            log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
                 avg_loss.update(L_overall_valid.item())
                 avg_l_t.update(L_t_valid.item())
                 avg_l_a.update(L_a_valid.item())
 
                 if index == 0:
+                    input_rbg = torchvision.utils.make_grid(display_rgb, normalize=False, scale_each=True)
+                    writer.add_image('input/rbg_image', input_rbg, tensorboard_iter)
+
+                    input_trimap = inputs[:, 3, :, :].unsqueeze(dim=1)
+                    input_trimap = torchvision.utils.make_grid(input_trimap, normalize=False, scale_each=True)
+                    writer.add_image('input/trimap', input_trimap, tensorboard_iter)
+
                     trimap_adaption_res = (t_argmax.type(torch.FloatTensor) / 2).unsqueeze(dim=1)
                     trimap_adaption_res = torchvision.utils.make_grid(trimap_adaption_res, normalize=False, scale_each=True)
-                    writer.add_image('valid/pred/trimap_adaptation', trimap_adaption_res, tensorboard_iter)
-                    alpha_estimation_res = torchvision.utils.make_grid(alpha_estimation, normalize=True, scale_each=True)
-                    writer.add_image('valid/pred/alpha_estimation', alpha_estimation_res, tensorboard_iter)
+                    writer.add_image('pred/trimap_adaptation', trimap_adaption_res, tensorboard_iter)
+
+                    alpha_estimation_res = torchvision.utils.make_grid(alpha_estimation, normalize=False, scale_each=True)
+                    writer.add_image('pred/alpha_estimation', alpha_estimation_res, tensorboard_iter)
+
+                    gt_alpha = gt_alpha
+                    gt_alpha = torchvision.utils.make_grid(gt_alpha, normalize=False, scale_each=True)
+                    writer.add_image('gt/alpha', gt_alpha, tensorboard_iter)
+
+                    gt_trimap = (gt_trimap.type(torch.FloatTensor) / 2).unsqueeze(dim=1)
+                    gt_trimap = torchvision.utils.make_grid(gt_trimap, normalize=False, scale_each=True)
+                    writer.add_image('gt/trimap', gt_trimap, tensorboard_iter)
                 
                 pbar.update()
 
