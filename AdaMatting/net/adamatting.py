@@ -44,36 +44,52 @@ class AdaMatting(nn.Module):
         # T-decoder
         self.t_decoder_upscale1 = nn.Sequential(
             nn.Conv2d(256 * Bottleneck.expansion, 512 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(512*4),
+            nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale2 = nn.Sequential(
             nn.Conv2d(512, 256 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(256*4),
+            nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale3 = nn.Sequential(
             nn.Conv2d(256, 64 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(64*4),
+            nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale4 = nn.Sequential(
             nn.Conv2d(64, 3 * (2 ** 2), kernel_size=1, stride=1, padding=0, bias=True),
+            nn.BatchNorm2d(3 * (2 ** 2)),
+            nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
 
         # A-deocder
         self.a_decoder_upscale1 = nn.Sequential(
             nn.Conv2d(256 * Bottleneck.expansion, 512 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(512*4),
+            nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale2 = nn.Sequential(
             nn.Conv2d(512, 256 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(256*4),
+            nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale3 = nn.Sequential(
             nn.Conv2d(256, 64 * 4, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(64*4),
+            nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale4 = nn.Sequential(
             nn.Conv2d(64, 1 * (2 ** 2), kernel_size=1, stride=1, padding=0, bias=True),
+            nn.BatchNorm2d(1 * (2 ** 2)),
+            nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
 
