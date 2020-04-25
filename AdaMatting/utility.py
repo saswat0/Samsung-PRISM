@@ -62,18 +62,6 @@ def lr_scheduler(optimizer, init_lr, cur_iter, max_iter, max_decay_times, decay_
     return lr
 
 
-def clip_gradient(optimizer, grad_clip):
-    """
-    Clips gradients computed during backpropagation to avoid explosion of gradients.
-    :param optimizer: optimizer with the gradients to be clipped
-    :param grad_clip: clip value
-    """
-    for group in optimizer.param_groups:
-        for param in group['params']:
-            if param.grad is not None:
-                param.grad.data.clamp_(-grad_clip, grad_clip)
-
-
 class AverageMeter(object):
     """
     Keeps track of the most recent value, average, sum, and count of a metric.
@@ -97,6 +85,7 @@ class AverageMeter(object):
 
 def compute_sad(pred, alpha):
     pred = pred[0, 0, :, :].cpu().numpy()
+    print(pred.shape, alpha.shape)
     diff = np.abs(pred - alpha / 255)
     return np.sum(diff) / 1000
 

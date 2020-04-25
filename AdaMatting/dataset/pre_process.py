@@ -225,7 +225,7 @@ def gen_train_valid_names(valid_portion, logger):
     # num_bgs = 43100
     num_bgs_per_fg = 100
     num_valid = int(valid_portion / 100 * 43100)
-    
+
     names = []
     bcount = 0
     for fcount in range(num_fgs):
