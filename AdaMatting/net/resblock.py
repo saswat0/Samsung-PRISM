@@ -48,7 +48,7 @@ def make_resblock(inplanes, planes, blocks, stride=1, block=Bottleneck):
     if stride != 1 or inplanes != planes * block.expansion:
         downsample = nn.Sequential(
             nn.Conv2d(inplanes, planes * block.expansion,
-                        kernel_size=1, stride=stride, bias=True),
+                      kernel_size=1, stride=stride, bias=True),
             nn.BatchNorm2d(planes * block.expansion),
         )
 
@@ -57,5 +57,6 @@ def make_resblock(inplanes, planes, blocks, stride=1, block=Bottleneck):
     inplanes = planes * block.expansion
     for _ in range(1, blocks):
         layers.append(block(inplanes, planes))
+        inplanes = planes*block.expansion
 
     return nn.Sequential(*layers), inplanes
