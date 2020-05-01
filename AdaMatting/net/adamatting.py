@@ -44,71 +44,80 @@ class AdaMatting(nn.Module):
         # T-decoder
         self.t_decoder_upscale1 = nn.Sequential(
             nn.Conv2d(256 * Bottleneck.expansion, 512 * 4, kernel_size=3, stride=1, padding=1, bias=True),
-            nn.BatchNorm2d(512*4),
+            nn.BatchNorm2d(512 * 4),
             nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale2 = nn.Sequential(
             nn.Conv2d(512, 256 * 4, kernel_size=3, stride=1, padding=1, bias=True),
-            nn.BatchNorm2d(256*4),
+            nn.BatchNorm2d(256 * 4),
             nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale3 = nn.Sequential(
             nn.Conv2d(256, 64 * 4, kernel_size=3, stride=1, padding=1, bias=True),
-            nn.BatchNorm2d(64*4),
+            nn.BatchNorm2d(64 * 4),
             nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.t_decoder_upscale4 = nn.Sequential(
-            nn.Conv2d(64, 3 * (2 ** 2), kernel_size=1, stride=1, padding=0, bias=True),
+            nn.Conv2d(64, 3 * (2 ** 2), kernel_size=3, stride=1, padding=1, bias=True),
             nn.BatchNorm2d(3 * (2 ** 2)),
             nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
 
-        # A-decoder
+        # A-deocder
         self.a_decoder_upscale1 = nn.Sequential(
             nn.Conv2d(256 * Bottleneck.expansion, 512 * 4, kernel_size=3, stride=1, padding=1, bias=True),
-            nn.BatchNorm2d(512*4),
+            nn.BatchNorm2d(512 * 4),
             nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale2 = nn.Sequential(
             nn.Conv2d(512, 256 * 4, kernel_size=3, stride=1, padding=1, bias=True),
-            nn.BatchNorm2d(256*4),
+            nn.BatchNorm2d(256 * 4),
             nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale3 = nn.Sequential(
             nn.Conv2d(256, 64 * 4, kernel_size=3, stride=1, padding=1, bias=True),
-            nn.BatchNorm2d(64*4),
+            nn.BatchNorm2d(64 * 4),
             nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
         self.a_decoder_upscale4 = nn.Sequential(
-            nn.Conv2d(64, 1 * (2 ** 2), kernel_size=1, stride=1, padding=0, bias=True),
+            nn.Conv2d(64, 1 * (2 ** 2), kernel_size=3, stride=1, padding=1, bias=True),
             nn.BatchNorm2d(1 * (2 ** 2)),
             nn.ReLU(inplace=True),
             nn.PixelShuffle(2)
         )
 
         # Propagation unit
-        self.propunit = PropUnit(
-            input_dim=4 + 1 + 1,
-            hidden_dim=[1],
-            kernel_size=(1, 1),
-            num_layers=1,
-            seq_len=3,
-            bias=True)
+        # self.propunit = PropUnit(
+        #     input_dim=4 + 1 + 1,
+        #     hidden_dim=[1],
+        #     kernel_size=(3, 3),
+        #     num_layers=3,
+        #     seq_len=3,
+        #     bias=True)
+        self.prop_unit = nn.Sequential(
+            nn.Conv2d(3 + 1 + 1, 64, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 1, kernel_size=1, stride=1, padding=0, bias=True),
+        )
 
-        # Task uncertainty loss
+        # Task uncertainty loss parameters
         self.log_sigma_t_sqr = nn.Parameter(torch.log(torch.Tensor([16.0])))
         self.log_sigma_a_sqr = nn.Parameter(torch.log(torch.Tensor([16.0])))
 
 
     def forward(self, x):
-        raw = x
+        raw = x.clone()[:, 0:3, :, :]
         x = self.encoder_conv(x) # 64
         encoder_shallow = self.encoder_maxpool(x) # 64
 
@@ -120,19 +129,20 @@ class AdaMatting(nn.Module):
         shortcut_middle = self.shortcut_middle(encoder_middle) # 256
         shortcut_shallow = self.shortcut_shallow(encoder_shallow) # 64
 
-        t_decoder_deep = self.t_decoder_upscale1(encoder_result) + shortcut_deep # 512
-        t_decoder_middle = self.t_decoder_upscale2(t_decoder_deep) + shortcut_middle # 256
-        t_decoder_shallow = self.t_decoder_upscale3(t_decoder_middle) # 64
-        trimap_adaption = self.t_decoder_upscale4(t_decoder_shallow) # 3
-        t_argmax = trimap_adaption.argmax(dim=1)
+        t_decoder = self.t_decoder_upscale1(encoder_result) + shortcut_deep # 512
+        t_decoder = self.t_decoder_upscale2(t_decoder) + shortcut_middle # 256
+        t_decoder = self.t_decoder_upscale3(t_decoder) # 64
+        t_decoder = self.t_decoder_upscale4(t_decoder) # 3
+        t_argmax = t_decoder.argmax(dim=1)
 
-        a_decoder_deep = self.a_decoder_upscale1(encoder_result) # 512
-        a_decoder_middle = self.a_decoder_upscale2(a_decoder_deep) + shortcut_middle # 256
-        a_decoder_shallow = self.a_decoder_upscale3(a_decoder_middle) + shortcut_shallow # 64
-        a_decoder = self.a_decoder_upscale4(a_decoder_shallow) # 1
+        a_decoder = self.a_decoder_upscale1(encoder_result) # 512
+        a_decoder = self.a_decoder_upscale2(a_decoder) + shortcut_middle # 256
+        a_decoder = self.a_decoder_upscale3(a_decoder) + shortcut_shallow # 64
+        a_decoder = self.a_decoder_upscale4(a_decoder) # 1
+        
+        alpha_estimation = torch.cat((raw, torch.unsqueeze(t_argmax, dim=1).float() / 2, a_decoder), dim=1)
+        # alpha_estimation = torch.cat((raw, t_decoder, a_decoder), dim=1)
+        # alpha_estimation = self.propunit(alpha_estimation)
+        alpha_estimation = self.prop_unit(alpha_estimation)
 
-        propunit_input = torch.cat((raw, torch.unsqueeze(t_argmax, dim=1).float(), a_decoder), dim=1)
-        # propunit_input = torch.cat((raw, trimap_adaption, a_decoder), dim=1)
-        alpha_estimation = self.propunit(propunit_input)
-
-        return trimap_adaption, t_argmax, alpha_estimation, self.log_sigma_t_sqr, self.log_sigma_a_sqr
+        return t_decoder, t_argmax, alpha_estimation, self.log_sigma_t_sqr, self.log_sigma_a_sqr

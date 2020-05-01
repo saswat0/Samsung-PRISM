@@ -8,7 +8,7 @@ python main.py \
     --lr=0.0001 \
     --decay_iters=51182 \
     --cuda \
-    --gpu=0,1,6,7 \
+    --gpu=0,1,2,3 \
     --write_log \
     --save_ckpt \
     # --resume=./ckpts/ckpt.tar
