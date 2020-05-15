@@ -41,7 +41,16 @@ class AdaMatting(nn.Module):
         self.br2 = BR(64 * Bottleneck.expansion)
         self.br3 = BR(128 * Bottleneck.expansion)
 
-        # Shortcuts
+        #  RES boundary Shortcuts
+        # shortcut_inplanes = 64
+        # self.shortcut_shallow_intial, shortcut_inplanes = make_resblock(shortcut_inplanes, 256, blocks=1, stride=2, block=Bottleneck)
+        # self.shortcut_shallow = self.br1(self.shortcut_shallow_intial)
+        # self.shortcut_middle_initial, shortcut_inplanes = make_resblock(shortcut_inplanes, 256, blocks=1, stride=2, block=Bottleneck)
+        # self.shortcut_shallow = self.br2(self.shortcut_middle_initial)
+        # self.shortcut_deep_initial, shortcut_inplanes = make_resblock(shortcut_inplanes, 256, blocks=1, stride=2, block=Bottleneck)
+        # self.shortcut_deep = self.br3(self.shortcut_deep_initial)
+
+        # Boundary GCN Shortcuts
         self.shortcut_shallow_intial = GCN(64, 64)
         self.shortcut_shallow = self.br1(self.shortcut_shallow_intial)
         self.shortcut_middle_initial = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
