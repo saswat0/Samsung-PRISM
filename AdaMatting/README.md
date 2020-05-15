@@ -35,5 +35,5 @@ $ tensorboard --logdir ./runs
 
 ### Current Performance and logs
 Trained on 120 epochs
-SAD : 138.66
-MSE : 0.009 on Adobe-1k Composition dataset
+SAD : 127.66
+MSE : 0.011 on Adobe-1k Composition dataset
