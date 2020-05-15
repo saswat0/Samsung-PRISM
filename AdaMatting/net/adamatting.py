@@ -10,7 +10,7 @@ sys.path.append(os.path.join(cur_dir, "net"))
 from resblock import Bottleneck, make_resblock
 from gcn import GCN
 from propunit import PropUnit
-
+from BR import BR
 
 class AdaMatting(nn.Module):
 
@@ -36,10 +36,18 @@ class AdaMatting(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
         
+        #Boundary Refinement
+        self.br1 = BR(64)
+        self.br2 = BR(64 * Bottleneck.expansion)
+        self.br3 = BR(128 * Bottleneck.expansion)
+
         # Shortcuts
-        self.shortcut_shallow = GCN(64, 64)
-        self.shortcut_middle = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
-        self.shortcut_deep = GCN(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
+        self.shortcut_shallow_intial = GCN(64, 64)
+        self.shortcut_shallow = self.br1(self.shortcut_shallow_intial)
+        self.shortcut_middle_initial = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        self.shortcut_middle = self.br2(self.shortcut_middle_initial)
+        self.shortcut_deep_initial = GCN(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
+        self.shortcut_deep = self.br3(self.shortcut_deep_initial)
 
         # T-decoder
         self.t_decoder_upscale1 = nn.Sequential(
