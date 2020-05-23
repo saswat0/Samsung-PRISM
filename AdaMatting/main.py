@@ -21,7 +21,7 @@ def train(args, logger, device_ids):
 
     logger.info("Loading network")
     model = AdaMatting(in_channel=4)
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.0001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999), weight_decay=0.0001)
     if args.resume != "":
         ckpt = torch.load(args.resume)
         model.load_state_dict(ckpt["state_dict"])
@@ -90,7 +90,7 @@ def train(args, logger, device_ids):
             optimizer.zero_grad()
             trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(inputs)
 
-            L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, pred_trimap_argmax=t_argmax, 
+            L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=inputs[:, 3, :, :], 
                                                         pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
                                                         log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
@@ -127,7 +127,6 @@ def train(args, logger, device_ids):
         avg_loss = AverageMeter()
         avg_l_t = AverageMeter()
         avg_l_a = AverageMeter()
-        torch.cuda.empty_cache()
         torch.set_grad_enabled(False)
         model.eval()
         with tqdm(total=len(valid_loader)) as pbar:
@@ -137,7 +136,7 @@ def train(args, logger, device_ids):
                 gt_trimap = gts[:, 1, :, :].type(torch.LongTensor).to(device) # [bs, 320, 320]
 
                 trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(inputs)
-                L_overall_valid, L_t_valid, L_a_valid = task_uncertainty_loss(pred_trimap=trimap_adaption, pred_trimap_argmax=t_argmax, 
+                L_overall_valid, L_t_valid, L_a_valid = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=inputs[:, 3, :, :], 
                                                             pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
                                                             log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
@@ -189,7 +188,7 @@ def train(args, logger, device_ids):
         if is_best or is_alpha_best or args.save_ckpt:
             if not os.path.exists("ckpts"):
                 os.makedirs("ckpts")
-            save_checkpoint(ckpt_path=args.ckpt_path, is_best=is_best, is_alpha_best=is_alpha_best, logger=logger, model=model, optimizer=optimizer, 
+            save_checkpoint(ckpt_path=args.raw_data_path, is_best=is_best, is_alpha_best=is_alpha_best, logger=logger, model=model, optimizer=optimizer, 
                             epoch=epoch, cur_iter=cur_iter, peak_lr=peak_lr, best_loss=best_loss, best_alpha_loss=best_alpha_loss)
 
     writer.close()
@@ -198,7 +197,7 @@ def train(args, logger, device_ids):
 def test(args, logger, device_ids):
     logger.info("Loading network")
     model = AdaMatting(in_channel=4)
-    ckpt = torch.load("./ckpts/ckpt_best_alpha.tar")
+    ckpt = torch.load("/data/datasets/im/AdaMatting/ckpt_best_alpha.tar")
     model.load_state_dict(ckpt["state_dict"])
     if args.cuda:
         device = torch.device("cuda:{}".format(device_ids[0]))
