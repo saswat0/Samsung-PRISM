@@ -15,7 +15,8 @@ from utils import safe_crop
 # Just normalization for validation
 data_transforms = {
     'train': transforms.Compose([
-        transforms.ColorJitter(brightness=0.125, contrast=0.125, saturation=0.125),
+        transforms.ColorJitter(
+            brightness=0.125, contrast=0.125, saturation=0.125),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ]),
@@ -79,7 +80,8 @@ def process(im_name, bg_name):
     hratio = h / bh
     ratio = wratio if wratio > hratio else hratio
     if ratio > 1:
-        bg = cv.resize(src=bg, dsize=(math.ceil(bw * ratio), math.ceil(bh * ratio)), interpolation=cv.INTER_CUBIC)
+        bg = cv.resize(src=bg, dsize=(math.ceil(bw * ratio),
+                                      math.ceil(bh * ratio)), interpolation=cv.INTER_CUBIC)
 
     return composite4(im, bg, a, w, h)
 
