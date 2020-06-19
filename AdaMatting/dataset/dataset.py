@@ -22,13 +22,16 @@ class AdaMattingDataset(Dataset):
         data_transforms = {
             # values from ImageNet
             'train': transforms.Compose([
-                transforms.ColorJitter(brightness=0.25, contrast=0.25, saturation=0.25),
+                transforms.ColorJitter(
+                    brightness=0.25, contrast=0.25, saturation=0.25),
                 transforms.ToTensor(),
-                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+                transforms.Normalize([0.485, 0.456, 0.406], [
+                                     0.229, 0.224, 0.225]),
             ]),
             'valid': transforms.Compose([
                 transforms.ToTensor(),
-                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+                transforms.Normalize([0.485, 0.456, 0.406], [
+                                     0.229, 0.224, 0.225])
             ]),
         }
         self.transformer = data_transforms[self.mode]
@@ -41,11 +44,9 @@ class AdaMattingDataset(Dataset):
         filename = "dataset/{}_names.txt".format(self.mode)
         with open(filename, 'r') as file:
             self.names = file.read().splitlines()
-    
 
     def __len__(self):
         return len(self.names)
-    
 
     def __getitem__(self, index):
         name = self.names[index]
@@ -60,8 +61,10 @@ class AdaMattingDataset(Dataset):
         # Resize randomly if in training mode
         resize_factor = 0.75 * random.random() + 0.75 if self.mode == "train" else 1.0
         interpolation = cv.INTER_AREA if resize_factor <= 1 else cv.INTER_LINEAR
-        fg = cv.resize(fg, None, fx=resize_factor, fy=resize_factor, interpolation=interpolation)
-        alpha = cv.resize(alpha, None, fx=resize_factor, fy=resize_factor , interpolation=interpolation)
+        fg = cv.resize(fg, None, fx=resize_factor,
+                       fy=resize_factor, interpolation=interpolation)
+        alpha = cv.resize(alpha, None, fx=resize_factor,
+                          fy=resize_factor, interpolation=interpolation)
 
         # Rotate randomly in training mode
         if self.mode == "train":
@@ -75,7 +78,7 @@ class AdaMattingDataset(Dataset):
             alpha = np.fliplr(alpha)
         if self.mode == "train" and random.random() > 0.5:
             bg = np.fliplr(bg)
-        
+
         # Generate gt_trimap
         gt_trimap = np.zeros(alpha.shape, np.float32)
         gt_trimap.fill(128)
@@ -102,7 +105,7 @@ class AdaMattingDataset(Dataset):
             input_trimap = self.do_crop(input_trimap, x, y, crop_size)
         else:
             gt_alpha = alpha
-        
+
         # Resize and crop the bg to fit the fg
         h, w = fg.shape[:2]
         bh, bw = bg.shape[:2]
@@ -110,10 +113,13 @@ class AdaMattingDataset(Dataset):
         hratio = h / bh
         ratio = wratio if wratio > hratio else hratio
         if ratio > 1:
-            bg = cv.resize(src=bg, dsize=(math.ceil(bw * ratio), math.ceil(bh * ratio)), interpolation=cv.INTER_LINEAR)
+            bg = cv.resize(src=bg, dsize=(math.ceil(bw * ratio),
+                                          math.ceil(bh * ratio)), interpolation=cv.INTER_LINEAR)
         bh, bw = bg.shape[:2]
-        x = random.randint(0, bw - w - 1) if self.mode == "train" and bw > w else 0
-        y = random.randint(0, bh - h - 1) if self.mode == "train" and bh > h else 0
+        x = random.randint(
+            0, bw - w - 1) if self.mode == "train" and bw > w else 0
+        y = random.randint(
+            0, bh - h - 1) if self.mode == "train" and bh > h else 0
         bg = np.array(bg[y:y + h, x:x + w], np.float32)
 
         # Composite the merged image
@@ -126,23 +132,37 @@ class AdaMattingDataset(Dataset):
         if self.mode == "valid":
             h, w = input_img.shape[:2]
             if h > w:
-                input_img = cv.resize(input_img, (int(w * self.crop_size / h), self.crop_size), interpolation=cv.INTER_AREA)
-                input_trimap = cv.resize(input_trimap, (int(w * self.crop_size / h), self.crop_size), interpolation=cv.INTER_AREA)
-                gt_alpha = cv.resize(gt_alpha, (int(w * self.crop_size / h), self.crop_size), interpolation=cv.INTER_AREA)
+                input_img = cv.resize(input_img, (int(
+                    w * self.crop_size / h), self.crop_size), interpolation=cv.INTER_AREA)
+                input_trimap = cv.resize(input_trimap, (int(
+                    w * self.crop_size / h), self.crop_size), interpolation=cv.INTER_AREA)
+                gt_alpha = cv.resize(gt_alpha, (int(
+                    w * self.crop_size / h), self.crop_size), interpolation=cv.INTER_AREA)
                 left_border = int((self.crop_size - input_img.shape[1]) / 2)
-                right_border = self.crop_size - input_img.shape[1] - left_border
-                input_img = cv.copyMakeBorder(input_img, 0, 0, left_border, right_border, cv.BORDER_CONSTANT, value=[0, 0, 0])
-                input_trimap = cv.copyMakeBorder(input_trimap, 0, 0, left_border, right_border, cv.BORDER_CONSTANT, value=[0, 0, 0])
-                gt_alpha = cv.copyMakeBorder(gt_alpha, 0, 0, left_border, right_border, cv.BORDER_CONSTANT, value=[0, 0, 0])
+                right_border = self.crop_size - \
+                    input_img.shape[1] - left_border
+                input_img = cv.copyMakeBorder(
+                    input_img, 0, 0, left_border, right_border, cv.BORDER_CONSTANT, value=[0, 0, 0])
+                input_trimap = cv.copyMakeBorder(
+                    input_trimap, 0, 0, left_border, right_border, cv.BORDER_CONSTANT, value=[0, 0, 0])
+                gt_alpha = cv.copyMakeBorder(
+                    gt_alpha, 0, 0, left_border, right_border, cv.BORDER_CONSTANT, value=[0, 0, 0])
             else:
-                input_img = cv.resize(input_img, (self.crop_size, int(h * self.crop_size / w)), interpolation=cv.INTER_AREA)
-                input_trimap = cv.resize(input_trimap, (self.crop_size, int(h * self.crop_size / w)), interpolation=cv.INTER_AREA)
-                gt_alpha = cv.resize(gt_alpha, (self.crop_size, int(h * self.crop_size / w)), interpolation=cv.INTER_AREA)
+                input_img = cv.resize(input_img, (self.crop_size, int(
+                    h * self.crop_size / w)), interpolation=cv.INTER_AREA)
+                input_trimap = cv.resize(input_trimap, (self.crop_size, int(
+                    h * self.crop_size / w)), interpolation=cv.INTER_AREA)
+                gt_alpha = cv.resize(gt_alpha, (self.crop_size, int(
+                    h * self.crop_size / w)), interpolation=cv.INTER_AREA)
                 top_border = int((self.crop_size - input_img.shape[0]) / 2)
-                bottom_border = self.crop_size - input_img.shape[0] - top_border
-                input_img = cv.copyMakeBorder(input_img, top_border, bottom_border, 0, 0, cv.BORDER_CONSTANT, value=[0, 0, 0])
-                input_trimap = cv.copyMakeBorder(input_trimap, top_border, bottom_border, 0, 0, cv.BORDER_CONSTANT, value=[0, 0, 0])
-                gt_alpha = cv.copyMakeBorder(gt_alpha, top_border, bottom_border, 0, 0, cv.BORDER_CONSTANT, value=[0, 0, 0])
+                bottom_border = self.crop_size - \
+                    input_img.shape[0] - top_border
+                input_img = cv.copyMakeBorder(
+                    input_img, top_border, bottom_border, 0, 0, cv.BORDER_CONSTANT, value=[0, 0, 0])
+                input_trimap = cv.copyMakeBorder(
+                    input_trimap, top_border, bottom_border, 0, 0, cv.BORDER_CONSTANT, value=[0, 0, 0])
+                gt_alpha = cv.copyMakeBorder(
+                    gt_alpha, top_border, bottom_border, 0, 0, cv.BORDER_CONSTANT, value=[0, 0, 0])
 
         # Convert from BGR to RGB and store as PIL images
         rgb_input_img = cv.cvtColor(input_img, cv.COLOR_BGR2RGB)
@@ -150,20 +170,21 @@ class AdaMattingDataset(Dataset):
 
         display_rgb = transforms.ToTensor()(pil_input_img)
 
-        inputs = torch.zeros((4, self.crop_size, self.crop_size), dtype=torch.float)
+        inputs = torch.zeros(
+            (4, self.crop_size, self.crop_size), dtype=torch.float)
         inputs[0:3, :, :] = self.transformer(pil_input_img)
         inputs[3, :, :] = torch.from_numpy(input_trimap / 255.0)
 
-        gts = torch.zeros((2, self.crop_size, self.crop_size), dtype=torch.float)
+        gts = torch.zeros(
+            (2, self.crop_size, self.crop_size), dtype=torch.float)
         gts[0, :, :] = torch.from_numpy(gt_alpha / 255.0)
         gt_trimap = np.zeros(gt_alpha.shape, np.float32)
         gt_trimap.fill(1.0)
         gt_trimap[gt_alpha == 0] = 0.0
         gt_trimap[gt_alpha == 255] = 2.0
-        gts[1, :, :] = torch.from_numpy(gt_trimap)#out_gt_trimap)
+        gts[1, :, :] = torch.from_numpy(gt_trimap)  # out_gt_trimap)
 
         return display_rgb, inputs, gts
-
 
     def random_crop_pos(self, gt_trimap, crop_size=(320, 320)):
         crop_height, crop_width = crop_size
@@ -178,7 +199,6 @@ class AdaMattingDataset(Dataset):
             y = max(0, center_y - int(crop_height / 2))
         return x, y
 
-
     def do_crop(self, mat, x, y, crop_size):
         crop_height, crop_width = crop_size
         if len(mat.shape) == 2:
@@ -189,9 +209,9 @@ class AdaMattingDataset(Dataset):
         h, w = crop.shape[:2]
         ret[0:h, 0:w] = crop
         if crop_size != (self.crop_size, self.crop_size):
-            ret = cv.resize(ret, dsize=(self.crop_size, self.crop_size), interpolation=cv.INTER_AREA)
+            ret = cv.resize(ret, dsize=(
+                self.crop_size, self.crop_size), interpolation=cv.INTER_AREA)
         return ret
-
 
     def rotate_cv_image(self, image, angle=None, center=None, scale=1.0):
         (h, w) = image.shape[:2]
