@@ -30,5 +30,5 @@ def task_uncertainty_loss(pred_trimap, input_trimap_argmax, pred_alpha, gt_trima
     Lt = trimap_adaptation_loss(pred_trimap, gt_trimap)
     La = alpha_estimation_loss(pred_alpha, gt_alpha, input_trimap_argmax)
     const = torch.log(torch.Tensor([2.0])).cuda()
-    overall = 5e1 * Lt / (2 * torch.exp(log_sigma_t_sqr)) + 5e1 * La / torch.exp(log_sigma_a_sqr / 2) + (log_sigma_t_sqr + log_sigma_a_sqr) / 2 + const
+    overall = Lt / (2 * torch.exp(log_sigma_t_sqr)) + La / torch.exp(log_sigma_a_sqr / 2) + (log_sigma_t_sqr + log_sigma_a_sqr) / 2 + const
     return overall, Lt, La
