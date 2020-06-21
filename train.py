@@ -103,7 +103,7 @@ def weight_init(m):
 
 def build_model(args, logger):
     model = net.VGG16(args)
-    model.apply(weight_init)
+    # model.apply(weight_init)
     
     start_epoch = 1
     best_sad = 100000000.

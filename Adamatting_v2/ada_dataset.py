@@ -18,14 +18,12 @@ def gen_trimap(alpha):
     trimap[eroded >= 255] = 255
     trimap[dilated <= 0] = 0
 
-    ''' 
-    alpha_unknown = alpha[trimap == 128]
-    num_all = alpha_unknown.size
-    num_0 = (alpha_unknown == 0).sum()
-    num_1 = (alpha_unknown == 255).sum()
-    print("Debug:  0 : {}/{} {:.3f}".format(num_0, num_all, float(num_0)/num_all))
-    print("Debug: 255: {}/{} {:.3f}".format(num_1, num_all, float(num_1)/num_all))
-    '''
+    # alpha_unknown = alpha[trimap == 128]
+    # num_all = alpha_unknown.size
+    # num_0 = (alpha_unknown == 0).sum()
+    # num_1 = (alpha_unknown == 255).sum()
+    # print("Debug:  0 : {}/{} {:.3f}".format(num_0, num_all, float(num_0)/num_all))
+    # print("Debug: 255: {}/{} {:.3f}".format(num_1, num_all, float(num_1)/num_all))
 
     return trimap
 
