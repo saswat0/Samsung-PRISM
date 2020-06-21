@@ -54,9 +54,10 @@ class AdaMattingDataset(Dataset):
         bcount = int(name.split('.')[0].split('_')[1])
         im_name = self.fg_files[fcount]
         bg_name = self.bg_files[bcount]
-        fg = cv.imread(self.fg_path + im_name)
-        alpha = cv.imread(self.a_path + im_name, 0)
-        bg = cv.imread(self.bg_path + bg_name)
+
+        fg = cv.imread(self.fg_path + im_name)[:, :, :3]
+        alpha = cv.imread(self.a_path + im_name)[:, :, :0]
+        bg = cv.imread(self.bg_path + bg_name)[:, :, :3]
 
         # Resize randomly if in training mode
         resize_factor = 0.75 * random.random() + 0.75 if self.mode == "train" else 1.0
@@ -88,8 +89,9 @@ class AdaMattingDataset(Dataset):
         # Generate input_trimap
         k_size = random.randint(5, 29) if self.mode == "train" else 15
         kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (k_size, k_size))
-        eroded = cv.erode(gt_trimap, kernel)
-        dilated = cv.dilate(gt_trimap, kernel)
+        iterations = np.random.randint(5, 15)
+        eroded = cv.erode(gt_trimap, kernel, iterations=iterations)
+        dilated = cv.dilate(gt_trimap, kernel, iterations=iterations)
         input_trimap = np.zeros(gt_trimap.shape, np.float32)
         input_trimap.fill(128)
         input_trimap[eroded == 255] = 255
