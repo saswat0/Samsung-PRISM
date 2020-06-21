@@ -8,6 +8,8 @@ from torch.utils.data import DataLoader
 import net
 from ada_dataset import MatTransform, MatDatasetOffline
 from torchvision import transforms
+from tensorboardX import SummaryWriter
+from net.adamatting import AdaMatting
 import time
 import os
 import cv2
@@ -92,34 +94,59 @@ def get_dataset(args):
 
     return train_loader
 
-def weight_init(m):
-    if isinstance(m, nn.Conv2d):
-        torch.nn.init.xavier_normal_(m.weight.data)
-        #n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-        #m.weight.data.normal_(0, math.sqrt(2. / n))
-    elif isinstance(m, nn.BatchNorm2d):
-        m.weight.data.fill_(1)
-        m.bias.data.zero_()
+# def weight_init(m):
+#     if isinstance(m, nn.Conv2d):
+#         torch.nn.init.xavier_normal_(m.weight.data)
+#         #n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+#         #m.weight.data.normal_(0, math.sqrt(2. / n))
+#     elif isinstance(m, nn.BatchNorm2d):
+#         m.weight.data.fill_(1)
+#         m.bias.data.zero_()
 
-def build_model(args, logger):
-    model = net.VGG16(args)
+def build_model(args, logger, device_ids):
+    writer = SummaryWriter()
+    logger.info("Loading network")
+
     # model.apply(weight_init)
-    
     start_epoch = 1
     best_sad = 100000000.
-    if args.pretrain and os.path.isfile(args.pretrain):
-        logger.info("loading pretrain '{}'".format(args.pretrain))
-        ckpt = torch.load(args.pretrain)
-        model.load_state_dict(ckpt['state_dict'],strict=False)
-        logger.info("loaded pretrain '{}' (epoch {})".format(args.pretrain, ckpt['epoch']))
-    
-    if args.resume and os.path.isfile(args.resume):
-        logger.info("=> loading checkpoint '{}'".format(args.resume))
+
+    model = AdaMatting(in_channel=4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999), weight_decay=0.0001)
+    if args.resume != "":
         ckpt = torch.load(args.resume)
-        start_epoch = ckpt['epoch']
-        best_sad = ckpt['best_sad']
-        model.load_state_dict(ckpt['state_dict'],strict=True)
-        logger.info("=> loaded checkpoint '{}' (epoch {} bestSAD {:.3f})".format(args.resume, ckpt['epoch'], ckpt['best_sad']))
+        model.load_state_dict(ckpt["state_dict"])
+        optimizer.load_state_dict(ckpt["optimizer"])
+    if args.cuda:
+        for state in optimizer.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.cuda()
+        device = torch.device("cuda:{}".format(device_ids[0]))
+        if len(device_ids) > 1:
+            logger.info("Loading with multiple GPUs")
+            # model = convert_model(model)
+            model = model.to(device)
+            model = torch.nn.DataParallel(model, device_ids=device_ids)
+        else:
+            model = model.to(device)
+    else:
+        device = torch.device("cpu")
+        model = model.to(device)
+    
+    # if args.pretrain and os.path.isfile(args.pretrain):
+    #     logger.info("loading pretrain '{}'".format(args.pretrain))
+    #     ckpt = torch.load(args.pretrain)
+    #     model.load_state_dict(ckpt['state_dict'],strict=False)
+    #     logger.info("loaded pretrain '{}' (epoch {})".format(args.pretrain, ckpt['epoch']))
+    
+    # if args.resume and os.path.isfile(args.resume):
+    #     logger.info("=> loading checkpoint '{}'".format(args.resume))
+    #     ckpt = torch.load(args.resume)
+    #     start_epoch = ckpt['epoch']
+    #     best_sad = ckpt['best_sad']
+    #     model.load_state_dict(ckpt['state_dict'],strict=True)
+    #     logger.info("=> loaded checkpoint '{}' (epoch {} bestSAD {:.3f})".format(args.resume, ckpt['epoch'], ckpt['best_sad']))
     
     return start_epoch, model, best_sad
 
