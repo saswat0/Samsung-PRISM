@@ -1,19 +1,17 @@
 import os
 import torch
 import torchvision
+import cv2 as cv
+import numpy as np
+import argparse
+import cv2
+import time
+import torch.nn as nn
+import torch.nn.functional as F
+from net import adamatting
+from torchvision import transforms
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
-import cv2 as cv
-from torchvision import transforms
-import numpy as np
-
-from ada_dataset import AdaMattingDataset
-from dataset.pre_process import composite_dataset, gen_train_valid_names
-from net.adamatting import AdaMatting
-from loss import task_uncertainty_loss
-from utility import get_args, get_logger, lr_scheduler, save_checkpoint, AverageMeter, \
-                    compute_mse, compute_sad, gen_test_names, clip_gradient
-from net.sync_batchnorm import convert_model
 
 def gen_dataset(imgdir, trimapdir):
         sample_set = []
