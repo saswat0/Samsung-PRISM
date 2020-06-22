@@ -216,6 +216,37 @@ def ldata(loss):
     #return loss.data
     return loss.data[0]
 
+def trimap_adaptation_loss(pred_trimap, gt_trimap):
+    loss = nn.CrossEntropyLoss()
+    return loss(pred_trimap, gt_trimap)
+
+
+def alpha_estimation_loss(pred_alpha, gt_alpha, input_trimap_argmax):
+    """
+    input_trimap_argmax
+    0: background
+    1: unknown
+    2: foreground
+    """
+    # mask = torch.zeros(input_trimap_argmax.shape).cuda()
+    # mask[input_trimap_argmax == 1] = 1.
+    mask = input_trimap_argmax.eq(128 / 255).type(torch.FloatTensor)
+    mask = mask.unsqueeze(dim=1)
+    # transforms.ToPILImage()(mask[0, :, :, :]).save("temp_pics/mask.png")
+    mask = mask.cuda()
+    diff = (pred_alpha - gt_alpha + 1e-12).mul(mask)
+    return torch.abs(diff).sum() / (mask.sum() + 1.)
+
+
+def task_uncertainty_loss(pred_trimap, input_trimap_argmax, pred_alpha, gt_trimap, gt_alpha, log_sigma_t_sqr, log_sigma_a_sqr):
+    log_sigma_t_sqr = log_sigma_t_sqr.mean()
+    log_sigma_a_sqr = log_sigma_a_sqr.mean()
+    Lt = trimap_adaptation_loss(pred_trimap, gt_trimap)
+    La = alpha_estimation_loss(pred_alpha, gt_alpha, input_trimap_argmax)
+    const = torch.log(torch.Tensor([2.0])).cuda()
+    overall = Lt / (2 * torch.exp(log_sigma_t_sqr)) + La / torch.exp(log_sigma_a_sqr / 2) + (log_sigma_t_sqr + log_sigma_a_sqr) / 2 + const
+    return overall, Lt, La
+
 
 def train(args, model, optimizer, train_loader, epoch, logger):
     max_iter = 43100 * (1 - args.valid_portion / 100) / args.batch_size * args.epochs
@@ -240,16 +271,20 @@ def train(args, model, optimizer, train_loader, epoch, logger):
             trimap = trimap.cuda()
             img_norm = img_norm.cuda()
 
-        #print("Shape: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{}".format(img.shape, alpha.shape, fg.shape, bg.shape, trimap.shape))
-        #print("Val: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{} Img_info".format(img, alpha, fg, bg, trimap, img_info))
+        print("Shape: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{}".format(img.shape, alpha.shape, fg.shape, bg.shape, trimap.shape))
+        print("Val: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{} Img_info".format(img, alpha, fg, bg, trimap, img_info))
 
         lr_scheduler(optimizer=optimizer, init_lr=args.lr, cur_iter=cur_iter, max_iter=max_iter, 
                                   max_decay_times=40, decay_rate=0.9)
 
-        adjust_learning_rate(args, optimizer, epoch)
+        # adjust_learning_rate(args, optimizer, epoch)
         optimizer.zero_grad()
 
-        pred_mattes, pred_alpha = model(torch.cat((img_norm, trimap / 255.), 1))
+        trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, trimap / 255.), 1))
+
+        L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=inputs[:, 3, :, :], 
+                                                        pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
+                                                        log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
         if args.stage == 0:
             # stage0 loss, simple alpha loss
