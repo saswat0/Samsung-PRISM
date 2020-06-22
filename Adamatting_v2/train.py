@@ -6,21 +6,20 @@ import torch.optim as optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 import net
-from ada_dataset import MatTransform, MatDatasetOffline
+from data import MatTransform, MatDatasetOffline
 from torchvision import transforms
-from tensorboardX import SummaryWriter
-from net.adamatting import AdaMatting
 import time
 import os
 import cv2
 import numpy as np
-from test import inference_img_by_crop, inference_img_by_resize, inference_img_whole
+from deploy import inference_img_by_crop, inference_img_by_resize, inference_img_whole
 import math
 import logging
 
+
 def get_logger(fname):
     assert(fname != "")
-    logger = logging.getLogger("Disentangled Image Matting")
+    logger = logging.getLogger("DeepImageMatting")
     logger.setLevel(level = logging.INFO)
     formatter = logging.Formatter("%(asctime)s-%(filename)s:%(lineno)d-%(levelname)s-%(message)s")
 
@@ -94,27 +93,27 @@ def get_dataset(args):
 
     return train_loader
 
-# def weight_init(m):
-#     if isinstance(m, nn.Conv2d):
-#         torch.nn.init.xavier_normal_(m.weight.data)
-#         #n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-#         #m.weight.data.normal_(0, math.sqrt(2. / n))
-#     elif isinstance(m, nn.BatchNorm2d):
-#         m.weight.data.fill_(1)
-#         m.bias.data.zero_()
+def weight_init(m):
+    if isinstance(m, nn.Conv2d):
+        torch.nn.init.xavier_normal_(m.weight.data)
+        #n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+        #m.weight.data.normal_(0, math.sqrt(2. / n))
+    elif isinstance(m, nn.BatchNorm2d):
+        m.weight.data.fill_(1)
+        m.bias.data.zero_()
 
 def build_model(args, logger, device_ids):
-    writer = SummaryWriter()
-    logger.info("Loading network")
 
-    # model.apply(weight_init)
+    model = AdaMatting(in_channel=4)
+
     start_epoch = 1
     best_sad = 100000000.
 
-    model = AdaMatting(in_channel=4)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999), weight_decay=0.0001)
     if args.resume != "":
         ckpt = torch.load(args.resume)
+        start_epoch = ckpt['epoch']
+        best_sad = ckpt['best_sad']
         model.load_state_dict(ckpt["state_dict"])
         optimizer.load_state_dict(ckpt["optimizer"])
     if args.cuda:
@@ -133,29 +132,23 @@ def build_model(args, logger, device_ids):
     else:
         device = torch.device("cpu")
         model = model.to(device)
-    
-    # if args.pretrain and os.path.isfile(args.pretrain):
-    #     logger.info("loading pretrain '{}'".format(args.pretrain))
-    #     ckpt = torch.load(args.pretrain)
-    #     model.load_state_dict(ckpt['state_dict'],strict=False)
-    #     logger.info("loaded pretrain '{}' (epoch {})".format(args.pretrain, ckpt['epoch']))
-    
-    # if args.resume and os.path.isfile(args.resume):
-    #     logger.info("=> loading checkpoint '{}'".format(args.resume))
-    #     ckpt = torch.load(args.resume)
-    #     start_epoch = ckpt['epoch']
-    #     best_sad = ckpt['best_sad']
-    #     model.load_state_dict(ckpt['state_dict'],strict=True)
-    #     logger.info("=> loaded checkpoint '{}' (epoch {} bestSAD {:.3f})".format(args.resume, ckpt['epoch'], ckpt['best_sad']))
-    
-    return start_epoch, model, best_sad
+
+    return start_epoch, model, best_sad, optimizer
 
 
-def adjust_learning_rate(args, opt, epoch):
-    if args.step > 0 and epoch >= args.step:
-        lr = args.lr * 0.1
-        for param_group in opt.param_groups:
-            param_group['lr'] = lr
+# def adjust_learning_rate(args, opt, epoch):
+#     if args.step > 0 and epoch >= args.step:
+#         lr = args.lr * 0.1
+#         for param_group in opt.param_groups:
+#             param_group['lr'] = lr
+
+def lr_scheduler(optimizer, init_lr, cur_iter, max_iter, max_decay_times, decay_rate):
+    lr = init_lr * decay_rate ** (cur_iter / max_iter * max_decay_times)
+
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
+    
+    # return lr
 
 
 def format_second(secs):
@@ -225,6 +218,7 @@ def ldata(loss):
 
 
 def train(args, model, optimizer, train_loader, epoch, logger):
+    max_iter = 43100 * (1 - args.valid_portion / 100) / args.batch_size * args.epochs
     model.train()
     t0 = time.time()
     #fout = open("train_loss.txt",'w')
@@ -248,6 +242,9 @@ def train(args, model, optimizer, train_loader, epoch, logger):
 
         #print("Shape: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{}".format(img.shape, alpha.shape, fg.shape, bg.shape, trimap.shape))
         #print("Val: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{} Img_info".format(img, alpha, fg, bg, trimap, img_info))
+
+        lr_scheduler(optimizer=optimizer, init_lr=args.lr, cur_iter=cur_iter, max_iter=max_iter, 
+                                  max_decay_times=40, decay_rate=0.9)
 
         adjust_learning_rate(args, optimizer, epoch)
         optimizer.zero_grad()
@@ -399,15 +396,28 @@ def main():
     train_loader = get_dataset(args)
 
     logger.info("Building model:")
-    start_epoch, model, best_sad = build_model(args, logger)
+    # logger.info("Loading network")
+    start_epoch, model, best_sad, optimizer = build_model(args, logger, device_ids=[0,1,2,3])
 
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
-    
-    if args.cuda:
-        model = model.cuda()
+    if args.resume != "":
+        logger.info("Start training from saved ckpt")
+        start_epoch = ckpt["epoch"] + 1
+        cur_iter = ckpt["cur_iter"]
+        peak_lr = ckpt["peak_lr"]
+        best_loss = ckpt["best_loss"]
+        best_alpha_loss = ckpt["best_alpha_loss"]
+    else:
+        logger.info("Start training from scratch")
+        start_epoch = 0
+        cur_iter = 0
+        peak_lr = args.lr
+        best_loss = float('inf')
+        best_alpha_loss = float('inf')
 
     # training
-    for epoch in range(start_epoch, args.nEpochs + 1):
+    for epoch in range(start_epoch, args.epochs+1):
+        torch.set_grad_enabled(True)
+
         train(args, model, optimizer, train_loader, epoch, logger)
         if epoch > 0 and args.testFreq > 0 and epoch % args.testFreq == 0:
             cur_sad = test(args, model, logger)
