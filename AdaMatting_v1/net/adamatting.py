@@ -41,9 +41,9 @@ class AdaMatting(nn.Module):
                 nn.init.constant_(m.bias, 0)
         
         #Boundary Refinement
-        self.br1 = BR(64)
-        self.br2 = BR(64 * Bottleneck.expansion)
-        self.br3 = BR(128 * Bottleneck.expansion)
+        # self.br1 = BR(64)
+        # self.br2 = BR(64 * Bottleneck.expansion)
+        # self.br3 = BR(128 * Bottleneck.expansion)
 
         #  RES boundary Shortcuts
         shortcut_inplanes = 64
@@ -63,9 +63,9 @@ class AdaMatting(nn.Module):
         # self.shortcut_deep = self.br3(self.shortcut_deep_initial)
 
         # Original shortcuts
-        # self.shortcut_shallow = GCN(64, 64)
-        # self.shortcut_middle = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
-        # self.shortcut_deep = GCN(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
+        self.shortcut_shallow = GCN(64, 64)
+        self.shortcut_middle = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        self.shortcut_deep = GCN(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
         # Separate two middle shortcuts
         # self.shortcut_shallow = self.shortcut_block(64, 64)
         # self.shortcut_middle_a = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
