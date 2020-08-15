@@ -12,7 +12,9 @@ import time
 import os
 import cv2
 import numpy as np
-from deploy import inference_img_by_crop, inference_img_by_resize, inference_img_whole
+from test import inference_img_by_crop, inference_img_by_resize, inference_img_whole
+from net.adamatting import AdaMatting
+from ada_dataset import MatTransform, MatDatasetOffline
 import math
 import logging
 

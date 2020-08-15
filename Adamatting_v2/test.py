@@ -86,13 +86,8 @@ def inference_once(args, model, scale_img, scale_trimap, aligned=True):
     input_t = torch.cat((tensor_img, tensor_trimap / 255.), 1)
     
     trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(input_t)
+    
     # # forward
-    # if args.stage <= 1:
-    #     # stage 1
-    #     pred_mattes, _ = model(input_t)
-    # else:
-    #     # stage 2, 3
-    #     _, pred_mattes = model(input_t)
     alpha_estimation = alpha_estimation.data
     if args.cuda:
         alpha_estimation = alpha_estimation.cpu()
