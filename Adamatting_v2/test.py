@@ -175,3 +175,107 @@ def inference_img_whole(args, model, img, trimap):
     origin_pred_mattes = cv2.resize(pred_mattes, (w, h), interpolation = cv2.INTER_LINEAR)
     assert(origin_pred_mattes.shape == trimap.shape)
     return origin_pred_mattes
+
+def main():
+
+    print("===> Loading args")
+    args = get_args()
+
+    print("===> Environment init")
+    #os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    if args.cuda and not torch.cuda.is_available():
+        raise Exception("No GPU found, please run without --cuda")
+
+    model = AdaMatting(in_channel=4)
+    ckpt = torch.load(args.resume)
+    if args.not_strict:
+        model.load_state_dict(ckpt['state_dict'], strict=False)
+    else:
+        model.load_state_dict(ckpt['state_dict'], strict=True)
+
+    if args.cuda:
+        model = model.cuda()
+
+    print("===> Load dataset")
+    dataset = gen_dataset(args.imgDir, args.trimapDir)
+
+    mse_diffs = 0.
+    sad_diffs = 0.
+    cnt = len(dataset)
+    cur = 0
+    t0 = time.time()
+    for img_path, trimap_path in dataset:
+        img = cv2.imread(img_path)
+        trimap = cv2.imread(trimap_path)[:, :, 0]
+
+        assert(img.shape[:2] == trimap.shape[:2])
+
+        img_info = (img_path.split('/')[-1], img.shape[0], img.shape[1])
+
+        cur += 1
+        print('[{}/{}] {}'.format(cur, cnt, img_info[0]))
+       
+        with torch.no_grad():
+            torch.cuda.empty_cache()
+
+            if args.crop_or_resize == "whole":
+                origin_pred_mattes = inference_img_whole(args, model, img, trimap)
+            elif args.crop_or_resize == "crop":
+                origin_pred_mattes = inference_img_by_crop(args, model, img, trimap)
+            else:
+                origin_pred_mattes = inference_img_by_resize(args, model, img, trimap)
+
+        # only attention unknown region
+        origin_pred_mattes[trimap == 255] = 1.
+        origin_pred_mattes[trimap == 0  ] = 0.
+
+        # origin trimap 
+        pixel = float((trimap == 128).sum())
+        
+        # eval if gt alpha is given
+        if args.alphaDir != '':
+            alpha_name = os.path.join(args.alphaDir, img_info[0])
+            assert(os.path.exists(alpha_name))
+            alpha = cv2.imread(alpha_name)[:, :, 0] / 255.
+            assert(alpha.shape == origin_pred_mattes.shape)
+
+            #x1 = (alpha[trimap == 255] == 1.0).sum() # x3
+            #x2 = (alpha[trimap == 0] == 0.0).sum() # x5
+            #x3 = (trimap == 255).sum()
+            #x4 = (trimap == 128).sum()
+            #x5 = (trimap == 0).sum()
+            #x6 = trimap.size # sum(x3,x4,x5)
+            #x7 = (alpha[trimap == 255] < 1.0).sum() # 0
+            #x8 = (alpha[trimap == 0] > 0).sum() #
+
+            #print(x1, x2, x3, x4, x5, x6, x7, x8)
+            #assert(x1 == x3)
+            #assert(x2 == x5)
+            #assert(x6 == x3 + x4 + x5)
+            #assert(x7 == 0)
+            #assert(x8 == 0)
+
+            mse_diff = ((origin_pred_mattes - alpha) ** 2).sum() / pixel
+            sad_diff = np.abs(origin_pred_mattes - alpha).sum()
+            mse_diffs += mse_diff
+            sad_diffs += sad_diff
+            print("sad:{} mse:{}".format(sad_diff, mse_diff))
+
+        origin_pred_mattes = (origin_pred_mattes * 255).astype(np.uint8)
+        res = origin_pred_mattes.copy()
+
+        # only attention unknown region
+        res[trimap == 255] = 255
+        res[trimap == 0  ] = 0
+
+        if not os.path.exists(args.saveDir):
+            os.makedirs(args.saveDir)
+        cv2.imwrite(os.path.join(args.saveDir, img_info[0]), res)
+
+    print("Avg-Cost: {} s/image".format((time.time() - t0) / cnt))
+    if args.alphaDir != '':
+        print("Eval-MSE: {}".format(mse_diffs / cur))
+        print("Eval-SAD: {}".format(sad_diffs / cur))
+
+if __name__ == "__main__":
+    main()
