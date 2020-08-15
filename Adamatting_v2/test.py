@@ -1,17 +1,32 @@
-import os
 import torch
-import torchvision
-import cv2 as cv
-import numpy as np
 import argparse
-import cv2
-import time
 import torch.nn as nn
-import torch.nn.functional as F
-from net import adamatting
+import net
+import cv2
+import os
 from torchvision import transforms
-from tensorboardX import SummaryWriter
-from tqdm import tqdm
+import torch.nn.functional as F
+import numpy as np
+import time
+
+def get_args():
+    # Training settings
+    parser = argparse.ArgumentParser(description='PyTorch Super Res Example')
+    parser.add_argument('--size_h', type=int, default=320, help="height size of input image")
+    parser.add_argument('--size_w', type=int, default=320, help="width size of input image")
+    parser.add_argument('--imgDir', type=str, required=True, help="directory of image")
+    parser.add_argument('--trimapDir', type=str, required=True, help="directory of trimap")
+    parser.add_argument('--cuda', action='store_true', help='use cuda?')
+    parser.add_argument('--resume', type=str, required=True, help="checkpoint that model resume from")
+    parser.add_argument('--saveDir', type=str, required=True, help="where prediction result save to")
+    parser.add_argument('--alphaDir', type=str, default='', help="directory of gt")
+    parser.add_argument('--stage', type=int, required=True, choices=[0,1,2,3], help="backbone stage")
+    parser.add_argument('--not_strict', action='store_true', help='not copy ckpt strict?')
+    parser.add_argument('--crop_or_resize', type=str, default="whole", choices=["resize", "crop", "whole"], help="how manipulate image before test")
+    parser.add_argument('--max_size', type=int, default=1600, help="max size of test image")
+    args = parser.parse_args()
+    print(args)
+    return args
 
 def gen_dataset(imgdir, trimapdir):
         sample_set = []
@@ -69,18 +84,19 @@ def inference_once(args, model, scale_img, scale_trimap, aligned=True):
     #print('Img Shape:{} Trimap Shape:{}'.format(img.shape, trimap.shape))
 
     input_t = torch.cat((tensor_img, tensor_trimap / 255.), 1)
-
-    # forward
-    if args.stage <= 1:
-        # stage 1
-        pred_mattes, _ = model(input_t)
-    else:
-        # stage 2, 3
-        _, pred_mattes = model(input_t)
-    pred_mattes = pred_mattes.data
+    
+    trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(input_t)
+    # # forward
+    # if args.stage <= 1:
+    #     # stage 1
+    #     pred_mattes, _ = model(input_t)
+    # else:
+    #     # stage 2, 3
+    #     _, pred_mattes = model(input_t)
+    alpha_estimation = alpha_estimation.data
     if args.cuda:
-        pred_mattes = pred_mattes.cpu()
-    pred_mattes = pred_mattes.numpy()[0, 0, :, :]
+        alpha_estimation = alpha_estimation.cpu()
+    pred_mattes = alpha_estimation.numpy()[0, 0, :, :]
     return pred_mattes
 
 
