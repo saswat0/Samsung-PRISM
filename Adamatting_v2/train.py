@@ -47,6 +47,8 @@ def get_args():
     parser.add_argument('--crop_h', type=str, required=True, help="crop height size of input image")
     parser.add_argument('--crop_w', type=str, required=True, help="crop width size of input image")
     parser.add_argument('--alphaDir', type=str, required=True, help="directory of alpha")
+    parser.add_argument('--cur_iter', type=int, default=0, help="current iteration")
+    parser.add_argument('--max_iter', type=int, default=0, help="maximum number of iterations")
     parser.add_argument('--fgDir', type=str, required=True, help="directory of fg")
     parser.add_argument('--bgDir', type=str, required=True, help="directory of bg")
     parser.add_argument('--imgDir', type=str, default="", help="directory of img")
@@ -118,19 +120,12 @@ def build_model(args, logger):
     
     return start_epoch, model, best_sad
 
-# def adjust_learning_rate(args, opt, epoch):
-#     if args.step > 0 and epoch >= args.step:
-#         lr = args.lr * 0.1
-#         for param_group in opt.param_groups:
-#             param_group['lr'] = lr
+def lr_scheduler(args, optimizer, init_lr, cur_iter, max_decay_times, decay_rate):
+    if args.step > 0:
+        lr = init_lr * decay_rate ** (cur_iter / args.max_iter * max_decay_times)
 
-def lr_scheduler(optimizer, init_lr, cur_iter, max_iter, max_decay_times, decay_rate):
-    lr = init_lr * decay_rate ** (cur_iter / max_iter * max_decay_times)
-
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
-    
-    # return lr
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
 
 
 def format_second(secs):
@@ -231,7 +226,7 @@ def task_uncertainty_loss(pred_trimap, input_trimap_argmax, pred_alpha, gt_trima
 
 
 def train(args, model, optimizer, train_loader, epoch, logger):
-    max_iter = 43100 * (1 - args.valid_portion / 100) / args.batch_size * args.epochs
+    
     model.train()
     t0 = time.time()
     #fout = open("train_loss.txt",'w')
@@ -256,10 +251,7 @@ def train(args, model, optimizer, train_loader, epoch, logger):
         print("Shape: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{}".format(img.shape, alpha.shape, fg.shape, bg.shape, trimap.shape))
         print("Val: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{} Img_info".format(img, alpha, fg, bg, trimap, img_info))
 
-        lr_scheduler(optimizer=optimizer, init_lr=args.lr, cur_iter=cur_iter, max_iter=max_iter, 
-                                  max_decay_times=40, decay_rate=0.9)
-
-        # adjust_learning_rate(args, optimizer, epoch)
+        lr_scheduler(args, optimizer=optimizer, init_lr=args.lr, cur_iter=args.cur_iter, max_decay_times=40, decay_rate=0.9)
         optimizer.zero_grad()
 
         trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, trimap / 255.), 1))
@@ -287,6 +279,7 @@ def train(args, model, optimizer, train_loader, epoch, logger):
         
         loss.backward()
         optimizer.step()
+        args.cur_iter += 1
 
         if iteration % args.printFreq ==  0:
             t1 = time.time()
@@ -414,28 +407,18 @@ def main():
 
     logger.info("Building model:")
     start_epoch, model, best_sad = build_model(args, logger)
+    args.cur_iter = 0
 
-    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999), weight_decay=0.0001)
+    optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr, betas=(0.9, 0.999), weight_decay=0.0001)
 
-    if args.resume != "":
-        logger.info("Start training from saved ckpt")
-        start_epoch = ckpt["epoch"] + 1
-        cur_iter = ckpt["cur_iter"]
-        peak_lr = ckpt["peak_lr"]
-        best_loss = ckpt["best_loss"]
-        best_alpha_loss = ckpt["best_alpha_loss"]
-    else:
-        logger.info("Start training from scratch")
-        start_epoch = 0
-        cur_iter = 0
-        peak_lr = args.lr
-        best_loss = float('inf')
-        best_alpha_loss = float('inf')
+    if args.cuda:
+        model = model.cuda()
+
+    args.max_iter = 43100 * (1 - args.valid_portion / 100) / args.batch_size * args.epochs
 
     # training
     for epoch in range(start_epoch, args.epochs+1):
-        torch.set_grad_enabled(True)
+        # torch.set_grad_enabled(True)
 
         train(args, model, optimizer, train_loader, epoch, logger)
         if epoch > 0 and args.testFreq > 0 and epoch % args.testFreq == 0:
