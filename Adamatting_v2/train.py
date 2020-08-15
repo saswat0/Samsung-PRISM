@@ -256,52 +256,25 @@ def train(args, model, optimizer, train_loader, epoch, logger):
 
         trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, trimap / 255.), 1))
 
-        L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=inputs[:, 3, :, :], 
-                                                        pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
+        L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=trimap, 
+                                                        pred_alpha=alpha_estimation, gt_trimap=trimap, gt_alpha=alpha, 
                                                         log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
-        if args.stage == 0:
-            # stage0 loss, simple alpha loss
-            loss = gen_simple_alpha_loss(alpha, trimap, pred_mattes, args)
-        elif args.stage == 1:
-            # stage1 loss
-            alpha_loss, comp_loss = gen_loss(img, alpha, fg, bg, trimap, pred_mattes)
-            loss = alpha_loss * args.wl_weight + comp_loss * (1. - args.wl_weight)
-        elif args.stage == 2:
-            # stage2 loss
-            loss = gen_alpha_pred_loss(alpha, pred_alpha, trimap)
-        else:
-            # stage3 loss = stage1 loss + stage2 loss
-            alpha_loss, comp_loss = gen_loss(img, alpha, fg, bg, trimap, pred_mattes)
-            loss1 = alpha_loss * args.wl_weight + comp_loss * (1. - args.wl_weight)
-            loss2 = gen_alpha_pred_loss(alpha, pred_alpha, trimap)
-            loss = loss1 + loss2
+        sigma_t, sigma_a = torch.exp(log_sigma_t_sqr.mean() / 2), torch.exp(log_sigma_a_sqr.mean() / 2)
         
-        loss.backward()
+        optimizer.zero_grad()
+        L_overall.backward()
         optimizer.step()
+
+        # if args.cur_iter % args.printFreq ==  0:
+        #     t1 = time.time()
+        #     num_iter = len(train_loader)
+        #     speed = (t1 - t0) / iteration
+        #     exp_time = format_second(speed * (num_iter * (args.nEpochs - epoch + 1) - iteration))
+
+        #     logger.info("Epoch: {:03d} | Iter: {:05d}/{} | Loss: {:.4e} | L_t: {:.4e} | L_a: {:.4e}"
+        #                     .format(epoch, index, len(train_loader), avg_lo.avg, avg_lt.avg, avg_la.avg))
         args.cur_iter += 1
-
-        if iteration % args.printFreq ==  0:
-            t1 = time.time()
-            num_iter = len(train_loader)
-            speed = (t1 - t0) / iteration
-            exp_time = format_second(speed * (num_iter * (args.nEpochs - epoch + 1) - iteration))
-
-            if args.stage == 0:
-                logger.info("Stage0-Epoch[{}/{}]({}/{}) Lr:{:.8f} Loss:{:.5f} Speed:{:.5f}s/iter {}".format(epoch, args.nEpochs, iteration, num_iter, optimizer.param_groups[0]['lr'], ldata(loss), speed, exp_time))
-                # stage 2
-            elif args.stage == 1:
-                # stage 1
-                logger.info("Stage1-Epoch[{}/{}]({}/{}) Lr:{:.8f} Loss:{:.5f} Alpha:{:.5f} Comp:{:.5f} Speed:{:.5f}s/iter {}".format(epoch, args.nEpochs, iteration, num_iter, optimizer.param_groups[0]['lr'], ldata(loss), ldata(alpha_loss), ldata(comp_loss), speed, exp_time))
-            elif args.stage == 2:
-                # stage 2
-                logger.info("Stage2-Epoch[{}/{}]({}/{}) Lr:{:.8f} Loss:{:.5f} Speed:{:.5f}s/iter {}".format(epoch, args.nEpochs, iteration, num_iter, optimizer.param_groups[0]['lr'], ldata(loss), speed, exp_time))
-            else:
-                # stage 3
-                logger.info("Stage3-Epoch[{}/{}]({}/{}) Lr:{:.8f} Loss:{:.5f} Stage1:{:.5f} Stage2:{:.5f} Speed:{:.5f}s/iter {}".format(epoch, args.nEpochs, iteration, num_iter, optimizer.param_groups[0]['lr'], ldata(loss), ldata(loss1), ldata(loss2), speed, exp_time))
-        #fout.write("{:.5f} {} {}\n".format(loss.data[0], img_info[0][0], img_info[1][0]))
-        #fout.flush()
-    #fout.close()
 
 
 def test(args, model, logger):
