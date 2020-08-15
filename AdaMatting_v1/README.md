@@ -22,7 +22,7 @@ Download and move all above compressed data files into a folder.
 Set `--raw_data_path={path_to_your_folder}` in any `.sh` file you use. 
 ### Decompress and composite the data
 ```bash
-$ bash ./prep.sh
+$ python prep.py
 ```
 ### Train
 ```bash
