@@ -21,7 +21,7 @@ import logging
 
 def get_logger(fname):
     assert(fname != "")
-    logger = logging.getLogger("DeepImageMatting")
+    logger = logging.getLogger("AdaMatting")
     logger.setLevel(level = logging.INFO)
     formatter = logging.Formatter("%(asctime)s-%(filename)s:%(lineno)d-%(levelname)s-%(message)s")
 
@@ -137,63 +137,6 @@ def format_second(secs):
     ss = "Exa(h:m:s):{:0>2}:{:0>2}:{:0>2}".format(h,m,s)
     return ss    
 
-
-def gen_simple_alpha_loss(alpha, trimap, pred_mattes, args):
-    weighted = torch.zeros(trimap.shape).cuda()
-    weighted[trimap == 128] = 1.
-    alpha_f = alpha / 255.
-    diff = pred_mattes - alpha_f
-    diff = diff * weighted
-    alpha_loss = torch.sqrt(diff ** 2 + 1e-12)
-
-    alpha_loss_weighted = alpha_loss.sum() / (weighted.sum() + 1.)
-
-    return alpha_loss_weighted
-
-
-
-def gen_loss(img, alpha, fg, bg, trimap, pred_mattes):
-    wi = torch.zeros(trimap.shape)
-    wi[trimap == 128] = 1.
-    t_wi = wi.cuda()
-    t3_wi = torch.cat((wi, wi, wi), 1).cuda()
-    unknown_region_size = t_wi.sum()
-
-    #assert(t_wi.shape == pred_mattes.shape)
-    #assert(t3_wi.shape == img.shape)
-
-    # alpha diff
-    alpha = alpha / 255.
-    alpha_loss = torch.sqrt((pred_mattes - alpha)**2 + 1e-12)
-    alpha_loss = (alpha_loss * t_wi).sum() / (unknown_region_size + 1.)
-
-    # composite rgb loss
-    pred_mattes_3 = torch.cat((pred_mattes, pred_mattes, pred_mattes), 1)
-    comp = pred_mattes_3 * fg + (1. - pred_mattes_3) * bg
-    comp_loss = torch.sqrt((comp - img) ** 2 + 1e-12) / 255.
-    comp_loss = (comp_loss * t3_wi).sum() / (unknown_region_size + 1.) / 3.
-
-    #print("Loss: AlphaLoss:{} CompLoss:{}".format(alpha_loss, comp_loss))
-    return alpha_loss, comp_loss
-   
-
-def gen_alpha_pred_loss(alpha, pred_alpha, trimap):
-    wi = torch.zeros(trimap.shape)
-    wi[trimap == 128] = 1.
-    t_wi = wi.cuda()
-    unknown_region_size = t_wi.sum()
-
-    # alpha diff
-    alpha = alpha / 255.
-    alpha_loss = torch.sqrt((pred_alpha - alpha)**2 + 1e-12)
-    alpha_loss = (alpha_loss * t_wi).sum() / (unknown_region_size + 1.)
-    
-    return alpha_loss
-
-
-def ldata(loss):
-    #return loss.data
-    return loss.data[0]
 
 def trimap_adaptation_loss(pred_trimap, gt_trimap):
     loss = nn.CrossEntropyLoss()
