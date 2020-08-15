@@ -16,6 +16,7 @@ from test import inference_img_by_crop, inference_img_by_resize, inference_img_w
 from net.adamatting import AdaMatting
 from ada_dataset import MatTransform, MatDatasetOffline
 import math
+from loss import trimap_adaptation_loss, alpha_estimation_loss, task_uncertainty_loss
 import logging
 
 
