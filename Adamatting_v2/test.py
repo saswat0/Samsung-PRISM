@@ -234,22 +234,6 @@ def main():
             alpha = cv2.imread(alpha_name)[:, :, 0] / 255.
             assert(alpha.shape == origin_pred_mattes.shape)
 
-            #x1 = (alpha[trimap == 255] == 1.0).sum() # x3
-            #x2 = (alpha[trimap == 0] == 0.0).sum() # x5
-            #x3 = (trimap == 255).sum()
-            #x4 = (trimap == 128).sum()
-            #x5 = (trimap == 0).sum()
-            #x6 = trimap.size # sum(x3,x4,x5)
-            #x7 = (alpha[trimap == 255] < 1.0).sum() # 0
-            #x8 = (alpha[trimap == 0] > 0).sum() #
-
-            #print(x1, x2, x3, x4, x5, x6, x7, x8)
-            #assert(x1 == x3)
-            #assert(x2 == x5)
-            #assert(x6 == x3 + x4 + x5)
-            #assert(x7 == 0)
-            #assert(x8 == 0)
-
             mse_diff = ((origin_pred_mattes - alpha) ** 2).sum() / pixel
             sad_diff = np.abs(origin_pred_mattes - alpha).sum()
             mse_diffs += mse_diff
