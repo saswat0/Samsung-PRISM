@@ -9,17 +9,18 @@ from tqdm import tqdm
 from multiprocessing import Pool
 from PIL import Image
 import random
-
+import torch
 
 def composite4(fg, bg, a, w, h):
-    fg = np.array(fg, np.float32)
-    bg = np.array(bg[0:h, 0:w], np.float32)
-    alpha = np.zeros((h, w, 1), np.float32)
-    alpha[:, :, 0] = a / 255.
-    comp = alpha * fg + (1 - alpha) * bg
-    comp = comp.astype(np.uint8)
-    return comp
+    bg = bg[0:w, 0:h] 
+    bg = torch.from_numpy(bg).transpose(0, 2).double()
+    fg = torch.from_numpy(fg).transpose(0, 2).double()
+    alpha = torch.from_numpy(a).transpose(0, 1).double() /255
+    composite_img = alpha * fg + (1 - alpha) * bg
+    composite_img = composite_img.int()
+    composite_img = composite_img.transpose(0, 2).numpy()
 
+    return composite_img
 
 def process(raw_data_path, im_name, bg_name, fcount, bcount, mode):
     fg_path = os.path.join(raw_data_path, '{}/fg/'.format(mode))
