@@ -6,9 +6,9 @@ import math
 import time
 import shutil
 
-root_dir = "Downloads/Combined_Dataset"
-test_bg_dir = 'Desktop/dataset/matting/VOCdevkit/VOC2012/JPEGImages'
-train_bg_dir = 'Desktop/dataset/matting/mscoco/train2017'
+root_dir = "Samsung-PRISM/AdaMatting_v1/Combined_Dataset"
+test_bg_dir = 'Samsung-PRISM/AdaMatting_v1/VOCdevkit/VOC2012/JPEGImages'
+train_bg_dir = 'Samsung-PRISM/AdaMatting_v1/mscoco/train2017'
 
 def my_composite(fg_names, bg_names, fg_dir, alpha_dir, bg_dir, num_bg, comp_dir):
     fg_ids = open(fg_names).readlines()
