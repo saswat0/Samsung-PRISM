@@ -52,9 +52,10 @@ def get_args():
     parser.add_argument('--alphaDir', type=str, default='D:/Samsung-PRISM/data/train/mask', help="directory of alpha")
     parser.add_argument('--cur_iter', type=int, default=0, help="current iteration")
     parser.add_argument('--max_iter', type=int, default=0, help="maximum number of iterations")
-    parser.add_argument('--fgDir', type=str, default='D:/Samsung-PRISM/data/train/fg', help="directory of fg")
-    parser.add_argument('--bgDir', type=str, default='D:/Samsung-PRISM/data/train/bg', help="directory of bg")
-    parser.add_argument('--imgDir', type=str, default='D:/Samsung-PRISM/data/train/merged', help="directory of img")
+    parser.add_argument('--alphaDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Training_set/alpha', help="directory of alpha")
+    parser.add_argument('--fgDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Training_set/fg', help="directory of fg")
+    parser.add_argument('--bgDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Training_set/bg', help="directory of bg")
+    parser.add_argument('--imgDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Training_set/image', help="directory of img")
     parser.add_argument('--batchSize', type=int, default=16, help='training batch size')
     parser.add_argument('--nEpochs', type=int, default=12, help='number of epochs to train for')
     parser.add_argument('--step', type=int, default=-1, help='epoch of learning decay')
@@ -68,12 +69,11 @@ def get_args():
     parser.add_argument('--printFreq', type=int, default=10, help="checkpoint that model save to")
     parser.add_argument('--ckptSaveFreq', type=int, default=10, help="checkpoint that model save to")
     parser.add_argument('--testFreq', type=int, default=1, help="test frequency")
-    parser.add_argument('--testImgDir', type=str, default='D:/Samsung-PRISM/data/test/merged', help="test image")
-    parser.add_argument('--testTrimapDir', type=str, default='D:/Samsung-PRISM/data/test/mask', help="test trimap")
-    parser.add_argument('--testAlphaDir', type=str, default='D:/Samsung-PRISM/data/test/mask', help="test alpha ground truth")
+    parser.add_argument('--testImgDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Test_set/image', help="test image")
+    parser.add_argument('--testTrimapDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Test_set/trimap', help="test trimap")
+    parser.add_argument('--testAlphaDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Test_set/alpha', help="test alpha ground truth")
     parser.add_argument('--testResDir', type=str, default='D:/Samsung-PRISM/data/test/', help="test result save to")
     parser.add_argument('--crop_or_resize', type=str, default="whole", choices=["resize", "crop", "whole"], help="how manipulate image before test")
-    parser.add_argument('--max_size', type=int, default=1312, help="max size of test image")
     parser.add_argument('--log', type=str, default='tmplog.txt', help="log file")
     args = parser.parse_args()
     return args
@@ -121,11 +121,10 @@ def build_model(args, logger):
     return start_epoch, model, best_sad
 
 def lr_scheduler(args, optimizer, init_lr, cur_iter, max_decay_times, decay_rate):
-    if args.step > 0:
-        lr = init_lr * decay_rate ** (cur_iter / args.max_iter * max_decay_times)
+    lr = init_lr * decay_rate ** (cur_iter / args.max_iter * max_decay_times)
 
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
 
 
 def format_second(secs):
@@ -299,6 +298,7 @@ def main():
 
     args.max_iter = 43100 * (1 - args.valid_portion / 100) / args.batch_size * args.epochs
 
+    logger.info("Starting Training")
     # training
     for epoch in range(start_epoch, args.epochs+1):
         # torch.set_grad_enabled(True)
@@ -308,6 +308,7 @@ def main():
             cur_sad = test(args, model, logger)
             if cur_sad < best_sad:
                 best_sad = cur_sad
+                print("New best SAD: ", best_sad)
                 checkpoint(epoch, args.saveDir, model, best_sad, logger, True)
         if epoch > 0 and epoch % args.ckptSaveFreq == 0:
             checkpoint(epoch, args.saveDir, model, best_sad, logger)
