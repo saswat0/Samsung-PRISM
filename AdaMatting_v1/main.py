@@ -349,10 +349,10 @@ def main():
     elif args.mode == "test":
         logger.info("Program runs in test mode")
         test(args=args, logger=logger, device_ids=device_ids)
-    # elif args.mode == "prep":
-    #     logger.info("Program runs in prep mode")
-    #     composite_dataset(args.raw_data_path, logger)
-    #     gen_train_valid_names(args.valid_portion, logger)
+    elif args.mode == "prep":
+        logger.info("Program runs in prep mode")
+        composite_dataset('D:\\Samsung-PRISM\\data', logger)
+        gen_train_valid_names(5, logger)
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ sys.path.append(os.path.join(cur_dir, "net"))
 from resblock import Bottleneck, make_resblock
 from gcn import GCN
 from propunit import PropUnit
-from BR import BR
+# from BR import BR
 
 class AdaMatting(nn.Module):
 

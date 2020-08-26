@@ -110,6 +110,7 @@ class MatDatasetOffline(torch.utils.data.Dataset):
             alpha_path = fg_path.replace(self.args.fgDir, self.args.alphaDir)
             img_path = fg_path.replace(self.args.fgDir, self.args.imgDir)
             bg_path = fg_path.replace(self.args.fgDir, self.args.bgDir)
+            print(alpha_path, img_path, bg_path)
             assert(os.path.exists(alpha_path))
             assert(os.path.exists(fg_path))
             assert(os.path.exists(bg_path))

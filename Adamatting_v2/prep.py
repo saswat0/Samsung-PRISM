@@ -6,9 +6,9 @@ import math
 import time
 import shutil
 
-root_dir = "Samsung-PRISM/AdaMatting_v1/Combined_Dataset"
-test_bg_dir = 'Samsung-PRISM/AdaMatting_v1/VOCdevkit/VOC2012/JPEGImages'
-train_bg_dir = 'Samsung-PRISM/AdaMatting_v1/mscoco/train2017'
+root_dir = "D:/Samsung-PRISM/Combined_Dataset"
+test_bg_dir = 'D:/Samsung-PRISM/VOC2012/JPEGImages'
+train_bg_dir = 'D:/Samsung-PRISM/train2017'
 
 def my_composite(fg_names, bg_names, fg_dir, alpha_dir, bg_dir, num_bg, comp_dir):
     fg_ids = open(fg_names).readlines()
@@ -96,7 +96,7 @@ def main():
     fout =  open(train_bg_names_coco2017, 'w')
     lls = fin.readlines()
     for l in lls:
-        fout.write(l[15:])
+        fout.write(l)
     fin.close()
     fout.close()
 
@@ -128,7 +128,7 @@ def main():
     copy_dir2dir(os.path.join(root_dir, "Training_set/Other/fg"), train_fg_dir)
 
     # composite test image
-    my_composite(test_fg_names, test_bg_names, test_fg_dir, test_alpha_dir, test_bg_dir, test_num_bg, test_comp_dir)
+    # my_composite(test_fg_names, test_bg_names, test_fg_dir, test_alpha_dir, test_bg_dir, test_num_bg, test_comp_dir)
     # composite train image
     my_composite(train_fg_names, train_bg_names_coco2017, train_fg_dir, train_alpha_dir, train_bg_dir, train_num_bg, train_comp_dir)
 

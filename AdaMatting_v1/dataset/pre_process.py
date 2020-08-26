@@ -73,7 +73,7 @@ def do_composite(raw_data_path, num_bgs, mode):
     with open(os.path.join(raw_data_path, 'Combined_Dataset', folder, '{}.txt').format(txt_name)) as f:
         fg_files = f.read().splitlines()
 
-    with Pool(processes=16) as p:
+    with Pool(processes=8) as p:
         max_ = len(fg_files)
         params = []
         for i in range(max_):

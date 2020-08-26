@@ -6,7 +6,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 import net
-from data import MatTransform, MatDatasetOffline
+from ada_dataset import MatTransform, MatDatasetOffline
 from torchvision import transforms
 import time
 import os
@@ -45,11 +45,11 @@ def get_logger(fname):
 def get_args():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch Super Res Example')
-    parser.add_argument('--size_h', type=int, default=320, required=True, help="height size of input image")
-    parser.add_argument('--size_w', type=int, default=320, required=True, help="width size of input image")
+    parser.add_argument('--size_h', type=int, default=320, help="height size of input image")
+    parser.add_argument('--size_w', type=int, default=320, help="width size of input image")
     parser.add_argument('--crop_h', type=str, default='320,480,640', help="crop height size of input image")
     parser.add_argument('--crop_w', type=str, default='320,480,640', help="crop width size of input image")
-    parser.add_argument('--alphaDir', type=str, default='D:/Samsung-PRISM/data/train/alpha', help="directory of alpha")
+    parser.add_argument('--alphaDir', type=str, default='D:/Samsung-PRISM/data/train/mask', help="directory of alpha")
     parser.add_argument('--cur_iter', type=int, default=0, help="current iteration")
     parser.add_argument('--max_iter', type=int, default=0, help="maximum number of iterations")
     parser.add_argument('--fgDir', type=str, default='D:/Samsung-PRISM/data/train/fg', help="directory of fg")
@@ -70,7 +70,7 @@ def get_args():
     parser.add_argument('--testFreq', type=int, default=1, help="test frequency")
     parser.add_argument('--testImgDir', type=str, default='D:/Samsung-PRISM/data/test/merged', help="test image")
     parser.add_argument('--testTrimapDir', type=str, default='D:/Samsung-PRISM/data/test/mask', help="test trimap")
-    parser.add_argument('--testAlphaDir', type=str, default='D:/Samsung-PRISM/data/test/alpha', help="test alpha ground truth")
+    parser.add_argument('--testAlphaDir', type=str, default='D:/Samsung-PRISM/data/test/mask', help="test alpha ground truth")
     parser.add_argument('--testResDir', type=str, default='D:/Samsung-PRISM/data/test/', help="test result save to")
     parser.add_argument('--crop_or_resize', type=str, default="whole", choices=["resize", "crop", "whole"], help="how manipulate image before test")
     parser.add_argument('--max_size', type=int, default=1312, help="max size of test image")
