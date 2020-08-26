@@ -56,7 +56,7 @@ def get_args():
     parser.add_argument('--fgDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', help="directory of fg")
     parser.add_argument('--bgDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', help="directory of bg")
     parser.add_argument('--imgDir', type=str, default='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', help="directory of img")
-    parser.add_argument('--batch_size', type=int, default=16, help='training batch size')
+    parser.add_argument('--batch_size', type=int, default=4, help='training batch size')
     parser.add_argument('--epochs', type=int, default=120, help='number of epochs to train for')
     parser.add_argument('--step', type=int, default=-1, help='epoch of learning decay')
     parser.add_argument('--lr', type=float, default=0.0001, help='Learning Rate. Default=0.01')
@@ -141,6 +141,7 @@ def train(args, model, optimizer, train_loader, epoch, logger):
     #fout = open("train_loss.txt",'w')
     for iteration, batch in enumerate(train_loader, 1):
         torch.cuda.empty_cache()
+        
         img = Variable(batch[0])
         alpha = Variable(batch[1])
         fg = Variable(batch[2])
@@ -148,25 +149,29 @@ def train(args, model, optimizer, train_loader, epoch, logger):
         trimap = Variable(batch[4])
         img_norm = Variable(batch[6])
         img_info = batch[-1]
-
+        
         if args.cuda:
             img = img.cuda()
-            alpha = alpha.cuda()
+            gt_alpha = (alpha[:, 0, :, :].unsqueeze(1)).type(torch.FloatTensor).cuda()
+            gt_trimap = trimap[:, 0, :, :].type(torch.LongTensor).cuda()
+            # alpha = alpha.cuda()
             fg = fg.cuda()
             bg = bg.cuda()
-            trimap = trimap.cuda()
+            # trimap = trimap.cuda()
             img_norm = img_norm.cuda()
 
-        print("Shape: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{}".format(img.shape, alpha.shape, fg.shape, bg.shape, trimap.shape))
-        print("Val: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{} Img_info".format(img, alpha, fg, bg, trimap, img_info))
+        print("Shape: \nImg:{} \nImg Norm:{} \nAlpha:{} \nFg:{} \nBg:{} \nTrimap:{} \ngt_Trimap:{} \ngt_alpha:{}".format(img.shape, img_norm.shape, alpha.shape, fg.shape, bg.shape, trimap.shape, gt_trimap.shape, gt_alpha.shape))
+        # print("Val: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{} Img_info".format(img, alpha, fg, bg, trimap, img_info))
 
         lr_scheduler(args, optimizer=optimizer, init_lr=args.lr, cur_iter=args.cur_iter, max_decay_times=40, decay_rate=0.9)
         optimizer.zero_grad()
 
-        trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, trimap / 255.), 1))
+        trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, gt_trimap / 255.), 1))
+        # print(trimap_adaption.shape, t_argmax.shape, alpha_estimation.shape, log_sigma_t_sqr.shape, log_sigma_a_sqr.shape)
+        # return
 
         L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=trimap, 
-                                                        pred_alpha=alpha_estimation, gt_trimap=trimap, gt_alpha=alpha, 
+                                                        pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
                                                         log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
         sigma_t, sigma_a = torch.exp(log_sigma_t_sqr.mean() / 2), torch.exp(log_sigma_a_sqr.mean() / 2)
@@ -229,6 +234,7 @@ def test(args, model, logger):
 
         # origin trimap 
         pixel = float((trimap == 128).sum())
+        # pixel = (trimap == 128).sum()
         
         # eval if gt alpha is given
         if args.testAlphaDir != '':
@@ -286,8 +292,8 @@ def main():
 
     logger.info("Loading dataset:")
     # train_loader = get_dataset(args)
-    # torch.save(train_loader, 'dataloader.pth')
-    train_loader = torch.load('dataloader.pth')
+    # torch.save(train_loader, 'dataloader_bs4.pth')
+    train_loader = torch.load('dataloader_bs4.pth')
 
     logger.info("Building model:")
     start_epoch, model, best_sad = build_model(args, logger)

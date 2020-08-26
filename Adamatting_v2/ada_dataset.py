@@ -173,13 +173,13 @@ class MatDatasetOffline(torch.utils.data.Dataset):
         else:
             img_norm = None
 
-        #img_id = img_info[0].split('/')[-1]
-        #cv2.imwrite("result/debug/{}_img.png".format(img_id), img)
-        #cv2.imwrite("result/debug/{}_alpha.png".format(img_id), alpha)
-        #cv2.imwrite("result/debug/{}_fg.png".format(img_id), fg)
-        #cv2.imwrite("result/debug/{}_bg.png".format(img_id), bg)
-        #cv2.imwrite("result/debug/{}_trimap.png".format(img_id), trimap)
-        #cv2.imwrite("result/debug/{}_grad.png".format(img_id), grad)
+        img_id = img_info[0].split('/')[-1]
+        # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_img.png".format(img_id), img)
+        # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_alpha.png".format(img_id), alpha)
+        # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_fg.png".format(img_id), fg)
+        # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_bg.png".format(img_id), bg)
+        # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_trimap.png".format(img_id), trimap)
+        # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_grad.png".format(img_id), grad)
         alpha = torch.from_numpy(alpha.astype(np.float32)[np.newaxis, :, :])
         trimap = torch.from_numpy(trimap.astype(np.float32)[np.newaxis, :, :])
         grad = torch.from_numpy(grad.astype(np.float32)[np.newaxis, :, :])
