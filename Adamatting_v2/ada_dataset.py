@@ -99,7 +99,7 @@ class MatDatasetOffline(torch.utils.data.Dataset):
         self.size_w = args.size_w
         self.crop_h = args.crop_h
         self.crop_w = args.crop_w
-        self.logger = logging.getLogger("DeepImageMatting")
+        self.logger = logging.getLogger("Disentangled Image Matting")
         assert(len(self.crop_h) == len(self.crop_w))
         
         fg_paths = get_files(self.args.fgDir)
