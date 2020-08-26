@@ -121,11 +121,10 @@ def build_model(args, logger):
     return start_epoch, model, best_sad
 
 def lr_scheduler(args, optimizer, init_lr, cur_iter, max_decay_times, decay_rate):
-    if args.step > 0:
-        lr = init_lr * decay_rate ** (cur_iter / args.max_iter * max_decay_times)
+    lr = init_lr * decay_rate ** (cur_iter / args.max_iter * max_decay_times)
 
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
 
 
 def format_second(secs):
@@ -299,6 +298,7 @@ def main():
 
     args.max_iter = 43100 * (1 - args.valid_portion / 100) / args.batch_size * args.epochs
 
+    logger.info("Starting Training")
     # training
     for epoch in range(start_epoch, args.epochs+1):
         # torch.set_grad_enabled(True)
@@ -308,6 +308,7 @@ def main():
             cur_sad = test(args, model, logger)
             if cur_sad < best_sad:
                 best_sad = cur_sad
+                print("New best SAD: ", best_sad)
                 checkpoint(epoch, args.saveDir, model, best_sad, logger, True)
         if epoch > 0 and epoch % args.ckptSaveFreq == 0:
             checkpoint(epoch, args.saveDir, model, best_sad, logger)
