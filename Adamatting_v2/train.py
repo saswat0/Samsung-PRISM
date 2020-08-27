@@ -170,9 +170,13 @@ def train(args, model, optimizer, train_loader, epoch, logger):
 
         trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, trimap / 255.), 1))
         # print(trimap_adaption.shape, t_argmax.shape, alpha_estimation.shape, log_sigma_t_sqr.shape, log_sigma_a_sqr.shape)
+        # tr = transforms.ToPILImage()(trimap_adaption)
+        # al = transforms.ToPILImage()(alpha_estimation)
+        # cv2.imwrite('debug_trimap.png', tr)
+        # cv2.imwrite('debug_alpha.png', al)
         # return
 
-        L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=trimap[:, 3, :, :], 
+        L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=trimap, 
                                                         pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
                                                         log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
