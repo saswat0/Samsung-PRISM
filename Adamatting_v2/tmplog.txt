@@ -235,3 +235,189 @@ Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', 
 2020-08-26 19:33:36,722-train_refer.py:258-INFO-Stage0-Epoch[1/20](30/10775) Lr:0.00100000 Loss:0.48883 Speed:0.88048s/iter Exa(h:m:s):52:41:57
 2020-08-26 19:33:43,493-train_refer.py:258-INFO-Stage0-Epoch[1/20](40/10775) Lr:0.00100000 Loss:0.68120 Speed:0.82956s/iter Exa(h:m:s):49:38:57
 2020-08-26 19:33:50,376-train_refer.py:258-INFO-Stage0-Epoch[1/20](50/10775) Lr:0.00100000 Loss:0.51367 Speed:0.80130s/iter Exa(h:m:s):47:57:20
+2020-08-27 22:57:45,447-train.py:289-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 22:57:45,512-train.py:299-INFO-Loading dataset:
+2020-08-27 22:57:45,641-train.py:304-INFO-Building model:
+2020-08-27 22:57:48,645-train.py:315-INFO-Starting Training
+2020-08-27 23:01:00,249-train.py:289-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:01:00,309-train.py:299-INFO-Loading dataset:
+2020-08-27 23:01:00,412-train.py:304-INFO-Building model:
+2020-08-27 23:01:02,240-train.py:315-INFO-Starting Training
+2020-08-27 23:11:29,915-train.py:289-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:11:29,984-train.py:299-INFO-Loading dataset:
+2020-08-27 23:11:30,083-train.py:304-INFO-Building model:
+2020-08-27 23:11:31,966-train.py:315-INFO-Starting Training
+2020-08-27 23:13:15,338-train.py:289-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:13:15,396-train.py:299-INFO-Loading dataset:
+2020-08-27 23:13:15,506-train.py:304-INFO-Building model:
+2020-08-27 23:13:17,290-train.py:315-INFO-Starting Training
+2020-08-27 23:14:30,761-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:14:30,817-train.py:300-INFO-Loading dataset:
+2020-08-27 23:14:30,926-train.py:305-INFO-Building model:
+2020-08-27 23:14:32,745-train.py:316-INFO-Starting Training
+2020-08-27 23:33:03,019-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=8, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:33:03,087-train.py:300-INFO-Loading dataset:
+2020-08-27 23:33:03,204-train.py:305-INFO-Building model:
+2020-08-27 23:33:06,159-train.py:316-INFO-Starting Training
+2020-08-27 23:33:29,723-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:33:29,797-train.py:300-INFO-Loading dataset:
+2020-08-27 23:33:29,888-train.py:305-INFO-Building model:
+2020-08-27 23:33:32,753-train.py:316-INFO-Starting Training
+2020-08-27 23:39:29,081-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:39:29,133-train.py:300-INFO-Loading dataset:
+2020-08-27 23:39:29,227-train.py:305-INFO-Building model:
+2020-08-27 23:39:31,308-train.py:316-INFO-Starting Training
+2020-08-27 23:41:54,780-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:41:54,835-train.py:300-INFO-Loading dataset:
+2020-08-27 23:41:54,917-train.py:305-INFO-Building model:
+2020-08-27 23:41:56,806-train.py:316-INFO-Starting Training
+2020-08-27 23:43:22,976-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-27 23:43:23,025-train.py:300-INFO-Loading dataset:
+2020-08-27 23:43:23,107-train.py:305-INFO-Building model:
+2020-08-27 23:43:25,238-train.py:316-INFO-Starting Training
+2020-08-27 23:43:31,257-train.py:196-INFO-Epoch: 001 | Iter: 00000/10775 | Loss: 3.5029e+00 | L_t: 1.1906e+00 | L_a: 0.0000e+00
+2020-08-27 23:43:36,799-train.py:196-INFO-Epoch: 001 | Iter: 00010/10775 | Loss: 3.4892e+00 | L_t: 7.8134e-01 | L_a: 0.0000e+00
+2020-08-27 23:43:42,634-train.py:196-INFO-Epoch: 001 | Iter: 00020/10775 | Loss: 3.4816e+00 | L_t: 5.7191e-01 | L_a: 0.0000e+00
+2020-08-27 23:43:48,494-train.py:196-INFO-Epoch: 001 | Iter: 00030/10775 | Loss: 3.4829e+00 | L_t: 6.4486e-01 | L_a: 0.0000e+00
+2020-08-27 23:43:54,329-train.py:196-INFO-Epoch: 001 | Iter: 00040/10775 | Loss: 3.4786e+00 | L_t: 5.3748e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:00,278-train.py:196-INFO-Epoch: 001 | Iter: 00050/10775 | Loss: 3.4827e+00 | L_t: 6.9948e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:06,386-train.py:196-INFO-Epoch: 001 | Iter: 00060/10775 | Loss: 3.4782e+00 | L_t: 5.8787e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:12,203-train.py:196-INFO-Epoch: 001 | Iter: 00070/10775 | Loss: 3.4770e+00 | L_t: 5.7925e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:18,110-train.py:196-INFO-Epoch: 001 | Iter: 00080/10775 | Loss: 3.4754e+00 | L_t: 5.6113e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:24,085-train.py:196-INFO-Epoch: 001 | Iter: 00090/10775 | Loss: 3.4738e+00 | L_t: 5.4200e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:30,279-train.py:196-INFO-Epoch: 001 | Iter: 00100/10775 | Loss: 3.4732e+00 | L_t: 5.5441e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:36,419-train.py:196-INFO-Epoch: 001 | Iter: 00110/10775 | Loss: 3.4718e+00 | L_t: 5.4151e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:42,661-train.py:196-INFO-Epoch: 001 | Iter: 00120/10775 | Loss: 3.4740e+00 | L_t: 6.4016e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:49,279-train.py:196-INFO-Epoch: 001 | Iter: 00130/10775 | Loss: 3.4739e+00 | L_t: 6.6801e-01 | L_a: 0.0000e+00
+2020-08-27 23:44:56,573-train.py:196-INFO-Epoch: 001 | Iter: 00140/10775 | Loss: 3.4687e+00 | L_t: 5.3488e-01 | L_a: 0.0000e+00
+2020-08-27 23:45:03,713-train.py:196-INFO-Epoch: 001 | Iter: 00150/10775 | Loss: 3.4725e+00 | L_t: 6.8566e-01 | L_a: 0.0000e+00
+2020-08-27 23:45:10,445-train.py:196-INFO-Epoch: 001 | Iter: 00160/10775 | Loss: 3.4685e+00 | L_t: 5.9172e-01 | L_a: 0.0000e+00
+2020-08-27 23:45:21,481-train.py:196-INFO-Epoch: 001 | Iter: 00170/10775 | Loss: 3.4651e+00 | L_t: 5.1560e-01 | L_a: 0.0000e+00
+2020-08-27 23:45:32,707-train.py:196-INFO-Epoch: 001 | Iter: 00180/10775 | Loss: 3.4630e+00 | L_t: 4.8172e-01 | L_a: 0.0000e+00
+2020-08-27 23:45:45,863-train.py:196-INFO-Epoch: 001 | Iter: 00190/10775 | Loss: 3.4617e+00 | L_t: 4.6909e-01 | L_a: 0.0000e+00
+2020-08-27 23:45:56,350-train.py:196-INFO-Epoch: 001 | Iter: 00200/10775 | Loss: 3.4619e+00 | L_t: 5.0834e-01 | L_a: 0.0000e+00
+2020-08-27 23:46:07,576-train.py:196-INFO-Epoch: 001 | Iter: 00210/10775 | Loss: 3.4661e+00 | L_t: 6.6989e-01 | L_a: 0.0000e+00
+2020-08-27 23:46:22,944-train.py:196-INFO-Epoch: 001 | Iter: 00220/10775 | Loss: 3.4646e+00 | L_t: 6.5329e-01 | L_a: 0.0000e+00
+2020-08-27 23:46:33,084-train.py:196-INFO-Epoch: 001 | Iter: 00230/10775 | Loss: 3.4582e+00 | L_t: 4.8495e-01 | L_a: 0.0000e+00
+2020-08-27 23:46:48,131-train.py:196-INFO-Epoch: 001 | Iter: 00240/10775 | Loss: 3.4595e+00 | L_t: 5.5459e-01 | L_a: 0.0000e+00
+2020-08-27 23:46:59,641-train.py:196-INFO-Epoch: 001 | Iter: 00250/10775 | Loss: 3.4599e+00 | L_t: 5.9775e-01 | L_a: 0.0000e+00
+2020-08-27 23:47:11,733-train.py:196-INFO-Epoch: 001 | Iter: 00260/10775 | Loss: 3.4551e+00 | L_t: 4.7888e-01 | L_a: 0.0000e+00
+2020-08-27 23:47:21,808-train.py:196-INFO-Epoch: 001 | Iter: 00270/10775 | Loss: 3.4545e+00 | L_t: 4.9281e-01 | L_a: 0.0000e+00
+2020-08-27 23:47:32,348-train.py:196-INFO-Epoch: 001 | Iter: 00280/10775 | Loss: 3.4548e+00 | L_t: 5.3078e-01 | L_a: 0.0000e+00
+2020-08-27 23:47:44,891-train.py:196-INFO-Epoch: 001 | Iter: 00290/10775 | Loss: 3.4548e+00 | L_t: 5.6265e-01 | L_a: 0.0000e+00
+2020-08-27 23:47:55,312-train.py:196-INFO-Epoch: 001 | Iter: 00300/10775 | Loss: 3.4591e+00 | L_t: 7.2734e-01 | L_a: 0.0000e+00
+2020-08-27 23:48:06,447-train.py:196-INFO-Epoch: 001 | Iter: 00310/10775 | Loss: 3.4506e+00 | L_t: 4.9247e-01 | L_a: 0.0000e+00
+2020-08-27 23:48:18,495-train.py:196-INFO-Epoch: 001 | Iter: 00320/10775 | Loss: 3.4488e+00 | L_t: 4.6813e-01 | L_a: 0.0000e+00
+2020-08-27 23:48:32,356-train.py:196-INFO-Epoch: 001 | Iter: 00330/10775 | Loss: 3.4519e+00 | L_t: 5.9470e-01 | L_a: 0.0000e+00
+2020-08-27 23:48:45,179-train.py:196-INFO-Epoch: 001 | Iter: 00340/10775 | Loss: 3.4466e+00 | L_t: 4.6009e-01 | L_a: 0.0000e+00
+2020-08-27 23:48:58,177-train.py:196-INFO-Epoch: 001 | Iter: 00350/10775 | Loss: 3.4506e+00 | L_t: 6.1537e-01 | L_a: 0.0000e+00
+2020-08-27 23:49:09,466-train.py:196-INFO-Epoch: 001 | Iter: 00360/10775 | Loss: 3.4487e+00 | L_t: 5.8692e-01 | L_a: 0.0000e+00
+2020-08-27 23:49:20,916-train.py:196-INFO-Epoch: 001 | Iter: 00370/10775 | Loss: 3.4548e+00 | L_t: 8.0521e-01 | L_a: 0.0000e+00
+2020-08-27 23:49:31,285-train.py:196-INFO-Epoch: 001 | Iter: 00380/10775 | Loss: 3.4438e+00 | L_t: 4.9551e-01 | L_a: 0.0000e+00
+2020-08-27 23:49:42,477-train.py:196-INFO-Epoch: 001 | Iter: 00390/10775 | Loss: 3.4449e+00 | L_t: 5.5874e-01 | L_a: 0.0000e+00
+2020-08-27 23:49:55,296-train.py:196-INFO-Epoch: 001 | Iter: 00400/10775 | Loss: 3.4458e+00 | L_t: 6.1634e-01 | L_a: 0.0000e+00
+2020-08-27 23:50:05,970-train.py:196-INFO-Epoch: 001 | Iter: 00410/10775 | Loss: 3.4465e+00 | L_t: 6.6992e-01 | L_a: 0.0000e+00
+2020-08-27 23:50:17,088-train.py:196-INFO-Epoch: 001 | Iter: 00420/10775 | Loss: 3.4380e+00 | L_t: 4.3936e-01 | L_a: 0.0000e+00
+2020-08-27 23:50:32,589-train.py:196-INFO-Epoch: 001 | Iter: 00430/10775 | Loss: 3.4478e+00 | L_t: 7.6902e-01 | L_a: 0.0000e+00
+2020-08-27 23:50:48,033-train.py:196-INFO-Epoch: 001 | Iter: 00440/10775 | Loss: 3.4404e+00 | L_t: 5.7325e-01 | L_a: 0.0000e+00
+2020-08-27 23:50:59,783-train.py:196-INFO-Epoch: 001 | Iter: 00450/10775 | Loss: 3.4411e+00 | L_t: 6.2424e-01 | L_a: 0.0000e+00
+2020-08-27 23:51:10,268-train.py:196-INFO-Epoch: 001 | Iter: 00460/10775 | Loss: 3.4347e+00 | L_t: 4.5912e-01 | L_a: 0.0000e+00
+2020-08-27 23:51:21,240-train.py:196-INFO-Epoch: 001 | Iter: 00470/10775 | Loss: 3.4359e+00 | L_t: 5.2377e-01 | L_a: 0.0000e+00
+2020-08-27 23:51:32,322-train.py:196-INFO-Epoch: 001 | Iter: 00480/10775 | Loss: 3.4359e+00 | L_t: 5.5541e-01 | L_a: 0.0000e+00
+2020-08-27 23:51:43,339-train.py:196-INFO-Epoch: 001 | Iter: 00490/10775 | Loss: 3.4324e+00 | L_t: 4.7679e-01 | L_a: 0.0000e+00
+2020-08-27 23:51:54,185-train.py:196-INFO-Epoch: 001 | Iter: 00500/10775 | Loss: 3.4311e+00 | L_t: 4.6825e-01 | L_a: 0.0000e+00
+2020-08-27 23:52:05,298-train.py:196-INFO-Epoch: 001 | Iter: 00510/10775 | Loss: 3.4318e+00 | L_t: 5.2011e-01 | L_a: 0.0000e+00
+2020-08-27 23:52:16,517-train.py:196-INFO-Epoch: 001 | Iter: 00520/10775 | Loss: 3.4281e+00 | L_t: 4.3720e-01 | L_a: 0.0000e+00
+2020-08-27 23:52:27,745-train.py:196-INFO-Epoch: 001 | Iter: 00530/10775 | Loss: 3.4310e+00 | L_t: 5.5422e-01 | L_a: 0.0000e+00
+2020-08-27 23:52:39,013-train.py:196-INFO-Epoch: 001 | Iter: 00540/10775 | Loss: 3.4307e+00 | L_t: 5.7562e-01 | L_a: 0.0000e+00
+2020-08-27 23:52:50,511-train.py:196-INFO-Epoch: 001 | Iter: 00550/10775 | Loss: 3.4324e+00 | L_t: 6.5721e-01 | L_a: 0.0000e+00
+2020-08-27 23:53:02,105-train.py:196-INFO-Epoch: 001 | Iter: 00560/10775 | Loss: 3.4311e+00 | L_t: 6.4553e-01 | L_a: 0.0000e+00
+2020-08-27 23:53:13,217-train.py:196-INFO-Epoch: 001 | Iter: 00570/10775 | Loss: 3.4245e+00 | L_t: 4.7694e-01 | L_a: 0.0000e+00
+2020-08-27 23:53:26,426-train.py:196-INFO-Epoch: 001 | Iter: 00580/10775 | Loss: 3.4262e+00 | L_t: 5.5642e-01 | L_a: 0.0000e+00
+2020-08-27 23:53:37,275-train.py:196-INFO-Epoch: 001 | Iter: 00590/10775 | Loss: 3.4209e+00 | L_t: 4.2823e-01 | L_a: 0.0000e+00
+2020-08-27 23:53:49,092-train.py:196-INFO-Epoch: 001 | Iter: 00600/10775 | Loss: 3.4208e+00 | L_t: 4.5518e-01 | L_a: 0.0000e+00
+2020-08-27 23:54:02,892-train.py:196-INFO-Epoch: 001 | Iter: 00610/10775 | Loss: 3.4213e+00 | L_t: 4.9877e-01 | L_a: 0.0000e+00
+2020-08-27 23:54:13,049-train.py:196-INFO-Epoch: 001 | Iter: 00620/10775 | Loss: 3.4202e+00 | L_t: 4.9575e-01 | L_a: 0.0000e+00
+2020-08-27 23:54:25,519-train.py:196-INFO-Epoch: 001 | Iter: 00630/10775 | Loss: 3.4236e+00 | L_t: 6.2713e-01 | L_a: 0.0000e+00
+2020-08-27 23:54:36,063-train.py:196-INFO-Epoch: 001 | Iter: 00640/10775 | Loss: 3.4165e+00 | L_t: 4.4432e-01 | L_a: 0.0000e+00
+2020-08-27 23:54:49,095-train.py:196-INFO-Epoch: 001 | Iter: 00650/10775 | Loss: 3.4162e+00 | L_t: 4.6375e-01 | L_a: 0.0000e+00
+2020-08-27 23:54:59,688-train.py:196-INFO-Epoch: 001 | Iter: 00660/10775 | Loss: 3.4168e+00 | L_t: 5.1106e-01 | L_a: 0.0000e+00
+2020-08-27 23:55:10,195-train.py:196-INFO-Epoch: 001 | Iter: 00670/10775 | Loss: 3.4140e+00 | L_t: 4.5595e-01 | L_a: 0.0000e+00
+2020-08-27 23:55:21,007-train.py:196-INFO-Epoch: 001 | Iter: 00680/10775 | Loss: 3.4120e+00 | L_t: 4.2652e-01 | L_a: 0.0000e+00
+2020-08-27 23:55:32,283-train.py:196-INFO-Epoch: 001 | Iter: 00690/10775 | Loss: 3.4119e+00 | L_t: 4.5247e-01 | L_a: 0.0000e+00
+2020-08-27 23:55:43,244-train.py:196-INFO-Epoch: 001 | Iter: 00700/10775 | Loss: 3.4134e+00 | L_t: 5.2841e-01 | L_a: 0.0000e+00
+2020-08-27 23:55:54,359-train.py:196-INFO-Epoch: 001 | Iter: 00710/10775 | Loss: 3.4112e+00 | L_t: 4.9204e-01 | L_a: 0.0000e+00
+2020-08-27 23:56:05,513-train.py:196-INFO-Epoch: 001 | Iter: 00720/10775 | Loss: 3.4086e+00 | L_t: 4.4250e-01 | L_a: 0.0000e+00
+2020-08-27 23:56:22,698-train.py:196-INFO-Epoch: 001 | Iter: 00730/10775 | Loss: 3.4089e+00 | L_t: 4.7992e-01 | L_a: 0.0000e+00
+2020-08-27 23:56:35,373-train.py:196-INFO-Epoch: 001 | Iter: 00740/10775 | Loss: 3.4092e+00 | L_t: 5.1833e-01 | L_a: 0.0000e+00
+2020-08-27 23:56:52,259-train.py:196-INFO-Epoch: 001 | Iter: 00750/10775 | Loss: 3.4100e+00 | L_t: 5.7166e-01 | L_a: 0.0000e+00
+2020-08-27 23:57:02,967-train.py:196-INFO-Epoch: 001 | Iter: 00760/10775 | Loss: 3.4054e+00 | L_t: 4.6385e-01 | L_a: 0.0000e+00
+2020-08-27 23:57:17,268-train.py:196-INFO-Epoch: 001 | Iter: 00770/10775 | Loss: 3.4113e+00 | L_t: 6.6911e-01 | L_a: 0.0000e+00
+2020-08-27 23:57:28,612-train.py:196-INFO-Epoch: 001 | Iter: 00780/10775 | Loss: 3.4120e+00 | L_t: 7.1897e-01 | L_a: 0.0000e+00
+2020-08-27 23:57:41,567-train.py:196-INFO-Epoch: 001 | Iter: 00790/10775 | Loss: 3.4082e+00 | L_t: 6.3372e-01 | L_a: 0.0000e+00
+2020-08-27 23:57:52,130-train.py:196-INFO-Epoch: 001 | Iter: 00800/10775 | Loss: 3.3996e+00 | L_t: 4.0838e-01 | L_a: 0.0000e+00
+2020-08-27 23:58:03,557-train.py:196-INFO-Epoch: 001 | Iter: 00810/10775 | Loss: 3.4071e+00 | L_t: 6.5909e-01 | L_a: 0.0000e+00
+2020-08-27 23:58:14,325-train.py:196-INFO-Epoch: 001 | Iter: 00820/10775 | Loss: 3.3995e+00 | L_t: 4.6255e-01 | L_a: 0.0000e+00
+2020-08-27 23:58:24,915-train.py:196-INFO-Epoch: 001 | Iter: 00830/10775 | Loss: 3.4010e+00 | L_t: 5.3633e-01 | L_a: 0.0000e+00
+2020-08-27 23:58:35,736-train.py:196-INFO-Epoch: 001 | Iter: 00840/10775 | Loss: 3.3969e+00 | L_t: 4.4477e-01 | L_a: 0.0000e+00
+2020-08-27 23:58:46,359-train.py:196-INFO-Epoch: 001 | Iter: 00850/10775 | Loss: 3.3995e+00 | L_t: 5.4984e-01 | L_a: 0.0000e+00
+2020-08-27 23:58:57,215-train.py:196-INFO-Epoch: 001 | Iter: 00860/10775 | Loss: 3.3949e+00 | L_t: 4.4551e-01 | L_a: 0.0000e+00
+2020-08-27 23:59:07,852-train.py:196-INFO-Epoch: 001 | Iter: 00870/10775 | Loss: 3.3937e+00 | L_t: 4.3864e-01 | L_a: 0.0000e+00
+2020-08-27 23:59:19,073-train.py:196-INFO-Epoch: 001 | Iter: 00880/10775 | Loss: 3.3953e+00 | L_t: 5.1442e-01 | L_a: 0.0000e+00
+2020-08-27 23:59:29,997-train.py:196-INFO-Epoch: 001 | Iter: 00890/10775 | Loss: 3.3912e+00 | L_t: 4.2062e-01 | L_a: 0.0000e+00
+2020-08-27 23:59:45,336-train.py:196-INFO-Epoch: 001 | Iter: 00900/10775 | Loss: 3.3898e+00 | L_t: 4.0945e-01 | L_a: 0.0000e+00
+2020-08-28 00:00:00,593-train.py:196-INFO-Epoch: 001 | Iter: 00910/10775 | Loss: 3.3952e+00 | L_t: 5.9684e-01 | L_a: 0.0000e+00
+2020-08-28 00:00:14,550-train.py:196-INFO-Epoch: 001 | Iter: 00920/10775 | Loss: 3.3893e+00 | L_t: 4.5306e-01 | L_a: 0.0000e+00
+2020-08-28 00:00:26,540-train.py:196-INFO-Epoch: 001 | Iter: 00930/10775 | Loss: 3.3940e+00 | L_t: 6.1906e-01 | L_a: 0.0000e+00
+2020-08-28 00:00:39,902-train.py:196-INFO-Epoch: 001 | Iter: 00940/10775 | Loss: 3.3896e+00 | L_t: 5.1788e-01 | L_a: 0.0000e+00
+2020-08-28 00:00:52,459-train.py:196-INFO-Epoch: 001 | Iter: 00950/10775 | Loss: 3.3862e+00 | L_t: 4.4718e-01 | L_a: 0.0000e+00
+2020-08-28 00:01:28,811-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-28 00:01:29,157-train.py:300-INFO-Loading dataset:
+2020-08-28 00:01:29,562-train.py:305-INFO-Building model:
+2020-08-28 00:01:37,524-train.py:316-INFO-Starting Training
+2020-08-28 00:02:32,902-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-28 00:02:32,959-train.py:300-INFO-Loading dataset:
+2020-08-28 00:02:33,043-train.py:305-INFO-Building model:
+2020-08-28 00:02:35,136-train.py:316-INFO-Starting Training
+2020-08-28 00:04:52,278-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-28 00:04:52,336-train.py:300-INFO-Loading dataset:
+2020-08-28 00:04:52,430-train.py:305-INFO-Building model:
+2020-08-28 00:04:54,390-train.py:316-INFO-Starting Training
+2020-08-28 00:12:32,024-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-28 00:12:32,083-train.py:300-INFO-Loading dataset:
+2020-08-28 00:12:32,172-train.py:305-INFO-Building model:
+2020-08-28 00:12:33,987-train.py:316-INFO-Starting Training
+2020-08-28 00:15:23,728-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-28 00:15:23,781-train.py:300-INFO-Loading dataset:
+2020-08-28 00:15:23,858-train.py:305-INFO-Building model:
+2020-08-28 00:15:25,656-train.py:316-INFO-Starting Training
+2020-08-28 00:19:02,593-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-28 00:19:02,641-train.py:300-INFO-Loading dataset:
+2020-08-28 00:19:02,714-train.py:305-INFO-Building model:
+2020-08-28 00:19:04,589-train.py:316-INFO-Starting Training
+2020-08-28 00:19:22,743-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-28 00:19:22,808-train.py:300-INFO-Loading dataset:
+2020-08-28 00:19:22,884-train.py:305-INFO-Building model:
+2020-08-28 00:19:24,653-train.py:316-INFO-Starting Training
+2020-08-28 00:20:39,078-train.py:290-INFO-Loading args: 
+Namespace(alphaDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/alpha', batch_size=4, bgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/bg', ckptSaveFreq=10, crop_h='320,480,640', crop_or_resize='whole', crop_w='320,480,640', cuda=True, cur_iter=0, epochs=120, fgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/fg', imgDir='D:/Samsung-PRISM/Combined_Dataset/Training_set/comp/image', log='tmplog.txt', lr=0.0001, max_iter=0, pretrain=None, printFreq=10, resume=None, saveDir='D:/Samsung-PRISM/', seed=123, size_h=320, size_w=320, step=-1, testAlphaDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/alpha', testFreq=1, testImgDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/image', testResDir='D:/Samsung-PRISM/data/test/', testTrimapDir='D:/Samsung-PRISM/Combined_Dataset/Test_set/comp/trimap', threads=4, valid_portion=5)
+2020-08-28 00:20:39,138-train.py:300-INFO-Loading dataset:
+2020-08-28 00:20:39,212-train.py:305-INFO-Building model:
+2020-08-28 00:20:41,117-train.py:316-INFO-Starting Training

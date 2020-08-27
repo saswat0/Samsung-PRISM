@@ -136,7 +136,7 @@ def format_second(secs):
     return ss    
 
 def train(args, model, optimizer, train_loader, epoch, logger):
-    
+    t0 = time.time()
     model.train()
     
     #fout = open("train_loss.txt",'w')
@@ -162,7 +162,7 @@ def train(args, model, optimizer, train_loader, epoch, logger):
             trimap = trimap.cuda()
             img_norm = img_norm.cuda()
 
-        print("Shape: \nImg:{} \nImg Norm:{} \nAlpha:{} \nFg:{} \nBg:{} \nTrimap:{} \ngt_Trimap:{} \ngt_alpha:{}".format(img.shape, img_norm.shape, alpha.shape, fg.shape, bg.shape, trimap.shape, gt_trimap.shape, gt_alpha.shape))
+        # print("Shape: \nImg:{} \nImg Norm:{} \nAlpha:{} \nFg:{} \nBg:{} \nTrimap:{} \ngt_Trimap:{} \ngt_alpha:{}".format(img.shape, img_norm.shape, alpha.shape, fg.shape, bg.shape, trimap.shape, gt_trimap.shape, gt_alpha.shape))
         # print("Val: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{} Img_info".format(img, alpha, fg, bg, trimap, img_info))
 
         lr_scheduler(args, optimizer=optimizer, init_lr=args.lr, cur_iter=args.cur_iter, max_decay_times=40, decay_rate=0.9)
@@ -179,6 +179,7 @@ def train(args, model, optimizer, train_loader, epoch, logger):
         L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=trimap, 
                                                         pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
                                                         log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
+        # print(L_overall, L_a, L_t)
 
         sigma_t, sigma_a = torch.exp(log_sigma_t_sqr.mean() / 2), torch.exp(log_sigma_a_sqr.mean() / 2)
         
@@ -186,14 +187,14 @@ def train(args, model, optimizer, train_loader, epoch, logger):
         L_overall.backward()
         optimizer.step()
 
-        # if args.cur_iter % args.printFreq ==  0:
-        #     t1 = time.time()
-        #     num_iter = len(train_loader)
-        #     speed = (t1 - t0) / iteration
-        #     exp_time = format_second(speed * (num_iter * (args.nEpochs - epoch + 1) - iteration))
+        if args.cur_iter % args.printFreq ==  0:
+            t1 = time.time()
+            num_iter = len(train_loader)
+            speed = (t1 - t0) / iteration
+            # exp_time = format_second(speed * (num_iter * (args.epochs - epoch + 1) - iteration))
 
-        #     logger.info("Epoch: {:03d} | Iter: {:05d}/{} | Loss: {:.4e} | L_t: {:.4e} | L_a: {:.4e}"
-        #                     .format(epoch, index, len(train_loader), avg_lo.avg, avg_lt.avg, avg_la.avg))
+            logger.info("Epoch: {:03d} | Iter: {:05d}/{} | Loss: {:.4e} | L_t: {:.4e} | L_a: {:.4e}"
+                            .format(epoch, args.cur_iter, len(train_loader), L_overall.item(), L_t.item(), L_a.item()))
         args.cur_iter += 1
 
 

@@ -180,22 +180,28 @@ class MatDatasetOffline(torch.utils.data.Dataset):
         # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_bg.png".format(img_id), bg)
         # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_trimap.png".format(img_id), trimap)
         # cv2.imwrite("D:\Samsung-PRISM\Adamatting_v2\result/debug/{}_grad.png".format(img_id), grad)
+        
+        x_img = torch.from_numpy(img.astype(np.float32)).permute(0, 1, 2).detach().cpu().numpy()
+        cv2.imwrite('img.png', x_img)
+        x_alpha = torch.from_numpy(alpha.astype(np.float32)[np.newaxis, :, :]).permute(1,2,0).detach().cpu().numpy()
+        # print(x_alpha.shape)
+        cv2.imwrite('alpha.png', x_alpha)
+        crop_size = x_img.shape[1]
+
+        gts = torch.zeros((2, crop_size, crop_size), dtype=torch.float)
+        gts[0, :, :] = torch.from_numpy(x_alpha / 255.0)
+        gt_trimap = np.zeros(x_alpha.shape, np.float32)
+        gt_trimap.fill(1.0)
+        gt_trimap[x_alpha == 0] = 0.0
+        gt_trimap[x_alpha == 255] = 2.0
+        gts[1, :, :] = torch.from_numpy(gt_trimap)
+        
         alpha = torch.from_numpy(alpha.astype(np.float32)[np.newaxis, :, :])
         trimap = torch.from_numpy(trimap.astype(np.float32)[np.newaxis, :, :])
         grad = torch.from_numpy(grad.astype(np.float32)[np.newaxis, :, :])
         img = torch.from_numpy(img.astype(np.float32)).permute(2, 0, 1)
         fg = torch.from_numpy(fg.astype(np.float32)).permute(2, 0, 1)
         bg = torch.from_numpy(bg.astype(np.float32)).permute(2, 0, 1)
-
-        crop_size = img.shape[1]
-
-        gts = torch.zeros((2, crop_size, crop_size), dtype=torch.float)
-        gts[0, :, :] = torch.from_numpy(alpha / 255.0)
-        gt_trimap = np.zeros(alpha.shape, np.float32)
-        gt_trimap.fill(1.0)
-        gt_trimap[gt_alpha == 0] = 0.0
-        gt_trimap[gt_alpha == 255] = 2.0
-        gts[1, :, :] = torch.from_numpy(gt_trimap)
 
         return img, alpha, fg, bg, trimap, grad, img_norm, gts, img_info
     
