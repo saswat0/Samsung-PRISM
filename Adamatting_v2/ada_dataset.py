@@ -187,7 +187,17 @@ class MatDatasetOffline(torch.utils.data.Dataset):
         fg = torch.from_numpy(fg.astype(np.float32)).permute(2, 0, 1)
         bg = torch.from_numpy(bg.astype(np.float32)).permute(2, 0, 1)
 
-        return img, alpha, fg, bg, trimap, grad, img_norm, img_info
+        crop_size = img.shape[1]
+
+        gts = torch.zeros((2, crop_size, crop_size), dtype=torch.float)
+        gts[0, :, :] = torch.from_numpy(alpha / 255.0)
+        gt_trimap = np.zeros(alpha.shape, np.float32)
+        gt_trimap.fill(1.0)
+        gt_trimap[gt_alpha == 0] = 0.0
+        gt_trimap[gt_alpha == 255] = 2.0
+        gts[1, :, :] = torch.from_numpy(gt_trimap)
+
+        return img, alpha, fg, bg, trimap, grad, img_norm, gts, img_info
     
     def __len__(self):
         return len(self.samples)

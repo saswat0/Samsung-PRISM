@@ -92,6 +92,7 @@ def get_dataset(args):
 
     train_set = MatDatasetOffline(args, train_transform, normalize)
     train_loader = DataLoader(dataset=train_set, num_workers=args.threads, batch_size=args.batch_size, shuffle=True)
+    transformer = train_transform
 
     return train_loader
 
@@ -137,7 +138,7 @@ def format_second(secs):
 def train(args, model, optimizer, train_loader, epoch, logger):
     
     model.train()
-    t0 = time.time()
+    
     #fout = open("train_loss.txt",'w')
     for iteration, batch in enumerate(train_loader, 1):
         torch.cuda.empty_cache()
@@ -148,16 +149,17 @@ def train(args, model, optimizer, train_loader, epoch, logger):
         bg = Variable(batch[3])
         trimap = Variable(batch[4])
         img_norm = Variable(batch[6])
+        gts = Variable(batch[7])
         img_info = batch[-1]
         
         if args.cuda:
             img = img.cuda()
-            gt_alpha = (alpha[:, 0, :, :].unsqueeze(1)).type(torch.FloatTensor).cuda()
-            gt_trimap = trimap[:, 0, :, :].type(torch.LongTensor).cuda()
-            # alpha = alpha.cuda()
+            gt_alpha = (gts[:, 0, :, :].unsqueeze(1)).type(torch.FloatTensor).cuda() # [bs, 1, 320, 320]
+            gt_trimap = gts[:, 1, :, :].type(torch.LongTensor).cuda() # [bs, 320, 320]
+            alpha = alpha.cuda()
             fg = fg.cuda()
             bg = bg.cuda()
-            # trimap = trimap.cuda()
+            trimap = trimap.cuda()
             img_norm = img_norm.cuda()
 
         print("Shape: \nImg:{} \nImg Norm:{} \nAlpha:{} \nFg:{} \nBg:{} \nTrimap:{} \ngt_Trimap:{} \ngt_alpha:{}".format(img.shape, img_norm.shape, alpha.shape, fg.shape, bg.shape, trimap.shape, gt_trimap.shape, gt_alpha.shape))
@@ -166,11 +168,11 @@ def train(args, model, optimizer, train_loader, epoch, logger):
         lr_scheduler(args, optimizer=optimizer, init_lr=args.lr, cur_iter=args.cur_iter, max_decay_times=40, decay_rate=0.9)
         optimizer.zero_grad()
 
-        trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, gt_trimap / 255.), 1))
+        trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, trimap / 255.), 1))
         # print(trimap_adaption.shape, t_argmax.shape, alpha_estimation.shape, log_sigma_t_sqr.shape, log_sigma_a_sqr.shape)
         # return
 
-        L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=trimap, 
+        L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=trimap[:, 3, :, :], 
                                                         pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 
                                                         log_sigma_t_sqr=log_sigma_t_sqr, log_sigma_a_sqr=log_sigma_a_sqr)
 
