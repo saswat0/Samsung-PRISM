@@ -162,6 +162,11 @@ def train(args, model, optimizer, train_loader, epoch, logger):
             trimap = trimap.cuda()
             img_norm = img_norm.cuda()
 
+        for i in range(gt_alpha.size(0)):
+           torchvision.utils.save_image(gt_alpha[i, :, :, :], '{}_gt_alpha.png'.format(i))
+        for i in range(gt_trimap.size(0)):
+           torchvision.utils.save_image(gt_trimap[i, :, :, :], '{}_gt_trimap.png'.format(i))
+
         # print("Shape: \nImg:{} \nImg Norm:{} \nAlpha:{} \nFg:{} \nBg:{} \nTrimap:{} \ngt_Trimap:{} \ngt_alpha:{}".format(img.shape, img_norm.shape, alpha.shape, fg.shape, bg.shape, trimap.shape, gt_trimap.shape, gt_alpha.shape))
         # print("Val: Img:{} Alpha:{} Fg:{} Bg:{} Trimap:{} Img_info".format(img, alpha, fg, bg, trimap, img_info))
 
@@ -169,12 +174,11 @@ def train(args, model, optimizer, train_loader, epoch, logger):
         optimizer.zero_grad()
 
         trimap_adaption, t_argmax, alpha_estimation, log_sigma_t_sqr, log_sigma_a_sqr = model(torch.cat((img_norm, trimap / 255.), 1))
+        for i in range(alpha_estimation.size(0)):
+           torchvision.utils.save_image(alpha_estimation[i, :, :, :], '{}_pred_alpha.png'.format(i))
+        for i in range(trimap_adaption.size(0)):
+           torchvision.utils.save_image(trimap_adaption[i, :, :, :], '{}_pred_trimap.png'.format(i))
         # print(trimap_adaption.shape, t_argmax.shape, alpha_estimation.shape, log_sigma_t_sqr.shape, log_sigma_a_sqr.shape)
-        # tr = transforms.ToPILImage()(trimap_adaption)
-        # al = transforms.ToPILImage()(alpha_estimation)
-        # cv2.imwrite('debug_trimap.png', tr)
-        # cv2.imwrite('debug_alpha.png', al)
-        # return
 
         L_overall, L_t, L_a = task_uncertainty_loss(pred_trimap=trimap_adaption, input_trimap_argmax=trimap, 
                                                         pred_alpha=alpha_estimation, gt_trimap=gt_trimap, gt_alpha=gt_alpha, 

@@ -55,9 +55,9 @@ class AdaMattingDataset(Dataset):
         im_name = self.fg_files[fcount]
         bg_name = self.bg_files[bcount]
 
-        fg = cv.imread(self.fg_path + im_name)[:, :, :3]
-        alpha = cv.imread(self.a_path + im_name)[:, :, :0]
-        bg = cv.imread(self.bg_path + bg_name)[:, :, :3]
+        fg = cv.imread(self.fg_path + im_name)#[:, :, :3]
+        alpha = cv.imread(self.a_path + im_name, 0)#[:, :, :0]
+        bg = cv.imread(self.bg_path + bg_name)#[:, :, :3]
 
         # Resize randomly if in training mode
         resize_factor = 0.75 * random.random() + 0.75 if self.mode == "train" else 1.0

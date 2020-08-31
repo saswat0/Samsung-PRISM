@@ -15,6 +15,7 @@ from utility import get_args, get_logger, lr_scheduler, save_checkpoint, Average
                     compute_mse, compute_sad, gen_test_names, clip_gradient
 from net.sync_batchnorm import convert_model
 
+from torch.autograd import Variable
 
 def train(args, logger, device_ids):
     writer = SummaryWriter()
@@ -44,12 +45,16 @@ def train(args, logger, device_ids):
         model = model.to(device)
 
     logger.info("Initializing data loaders")
+    # train_loader = torch.load('train_loader.pth')
+    # valid_loader = torch.load('valid_loader.pth')
     train_dataset = AdaMattingDataset(args.raw_data_path, "train")
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, 
-                                               num_workers=16, pin_memory=True, drop_last=True)
+                                               num_workers=0, pin_memory=True, drop_last=True)
+    # torch.save(train_loader, 'train_loader.pth')
     valid_dataset = AdaMattingDataset(args.raw_data_path, "valid")
     valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=args.batch_size, shuffle=False, 
-                                               num_workers=16, pin_memory=True, drop_last=True)
+                                               num_workers=4, pin_memory=True, drop_last=True)
+    # torch.save(valid_loader, 'valid_loader.pth')
 
     if args.resume != "":
         logger.info("Start training from saved ckpt")
@@ -76,7 +81,10 @@ def train(args, logger, device_ids):
         # Training
         torch.set_grad_enabled(True)
         model.train()
-        for index, (_, inputs, gts) in enumerate(train_loader):
+        for index, batch in enumerate(train_loader):
+            inputs = Variable(batch[1])
+            gts = Variable(batch[2])
+            # print("Epoch: {}\nCurr iter: {}".format(epoch, cur_iter))
             # cur_lr, peak_lr = lr_scheduler(optimizer=optimizer, cur_iter=cur_iter, peak_lr=peak_lr, end_lr=0.000001, 
             #                                decay_iters=args.decay_iters, decay_power=0.8, power=0.5)
             cur_lr = lr_scheduler(optimizer=optimizer, init_lr=args.lr, cur_iter=cur_iter, max_iter=max_iter, 
@@ -100,6 +108,9 @@ def train(args, logger, device_ids):
             L_overall.backward()
             clip_gradient(optimizer, 5)
             optimizer.step()
+
+            del inputs, gts, trimap_adaption, t_argmax, alpha_estimation
+            torch.cuda.empty_cache()
 
             avg_lo.update(L_overall.item())
             avg_lt.update(L_t.item())
@@ -351,8 +362,8 @@ def main():
         test(args=args, logger=logger, device_ids=device_ids)
     elif args.mode == "prep":
         logger.info("Program runs in prep mode")
-        composite_dataset('D:\\Samsung-PRISM\\data', logger)
-        gen_train_valid_names(5, logger)
+        composite_dataset(args.raw_data_path, logger)
+        gen_train_valid_names(args.valid_portion, logger)
 
 
 if __name__ == "__main__":

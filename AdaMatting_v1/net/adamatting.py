@@ -39,38 +39,11 @@ class AdaMatting(nn.Module):
             elif isinstance(m, nn.Linear):
                 nn.init.xavier_normal_(m.weight)
                 nn.init.constant_(m.bias, 0)
-        
-        #Boundary Refinement
-        # self.br1 = BR(64)
-        # self.br2 = BR(64 * Bottleneck.expansion)
-        # self.br3 = BR(128 * Bottleneck.expansion)
-
-        #  RES boundary Shortcuts
-        shortcut_inplanes = 64
-        self.shortcut_shallow_intial, shortcut_inplanes = make_resblock(shortcut_inplanes, 256, blocks=1, stride=2, block=Bottleneck)
-        self.shortcut_shallow = self.br1(self.shortcut_shallow_intial)
-        self.shortcut_middle_initial, shortcut_inplanes = make_resblock(shortcut_inplanes, 256, blocks=1, stride=2, block=Bottleneck)
-        self.shortcut_shallow = self.br2(self.shortcut_middle_initial)
-        self.shortcut_deep_initial, shortcut_inplanes = make_resblock(shortcut_inplanes, 256, blocks=1, stride=2, block=Bottleneck)
-        self.shortcut_deep = self.br3(self.shortcut_deep_initial)
-
-        # Boundary GCN Shortcuts
-        # self.shortcut_shallow_intial = GCN(64, 64)
-        # self.shortcut_shallow = self.br1(self.shortcut_shallow_intial)
-        # self.shortcut_middle_initial = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
-        # self.shortcut_middle = self.br2(self.shortcut_middle_initial)
-        # self.shortcut_deep_initial = GCN(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
-        # self.shortcut_deep = self.br3(self.shortcut_deep_initial)
-
-        # Original shortcuts
-        self.shortcut_shallow = GCN(64, 64)
-        self.shortcut_middle = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
-        self.shortcut_deep = GCN(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
-        # Separate two middle shortcuts
-        # self.shortcut_shallow = self.shortcut_block(64, 64)
-        # self.shortcut_middle_a = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
-        # self.shortcut_middle_t = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
-        # self.shortcut_deep = self.shortcut_block(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
+        # Shortcuts
+        self.shortcut_shallow = self.shortcut_block(64, 64)
+        self.shortcut_middle_a = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        self.shortcut_middle_t = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        self.shortcut_deep = self.shortcut_block(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
 
         # T-decoder
         self.t_decoder_upscale1 = nn.Sequential(
@@ -125,7 +98,7 @@ class AdaMatting(nn.Module):
         #     seq_len=3,
         #     bias=True)
         self.prop_unit = nn.Sequential(
-            nn.Conv2d(3 + 1 + 1, 64, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(4 + 3 + 1, 64, kernel_size=3, stride=1, padding=1, bias=True),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=True),
@@ -140,7 +113,7 @@ class AdaMatting(nn.Module):
 
 
     def forward(self, x):
-        raw = x.clone()[:, :3, :, :]
+        raw = x.clone()#[:, :3, :, :]
         x = self.encoder_conv(x) # 64
         encoder_shallow = self.encoder_maxpool(x) # 64
 
@@ -152,7 +125,7 @@ class AdaMatting(nn.Module):
         t_decoder = self.t_decoder_upscale2(t_decoder) + self.shortcut_middle_t(encoder_middle) # 256
         t_decoder = self.t_decoder_upscale3(t_decoder) # 64
         t_decoder = self.t_decoder_upscale4(t_decoder) # 3
-        # t_argmax = t_decoder.argmax(dim=1)
+        t_argmax = t_decoder.argmax(dim=1)
 
         a_decoder = self.a_decoder_upscale1(encoder_result) # 512
         a_decoder = self.a_decoder_upscale2(a_decoder) + self.shortcut_middle_a(encoder_middle) # 256

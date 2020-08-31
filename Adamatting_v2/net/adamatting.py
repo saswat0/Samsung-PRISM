@@ -289,7 +289,7 @@ class AdaMatting(nn.Module):
         #     seq_len=3,
         #     bias=True)
         self.prop_unit = nn.Sequential(
-            nn.Conv2d(3 + 1 + 1, 64, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(4 + 3 + 1, 64, kernel_size=3, stride=1, padding=1, bias=True),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=True),
@@ -304,7 +304,7 @@ class AdaMatting(nn.Module):
 
 
     def forward(self, x):
-        raw = x.clone()[:, 0:3, :, :]
+        raw = x.clone()#[:, 0:3, :, :]
         x = self.encoder_conv(x) # 64
         encoder_shallow = self.encoder_maxpool(x) # 64
 
@@ -327,8 +327,8 @@ class AdaMatting(nn.Module):
         a_decoder = self.a_decoder_upscale3(a_decoder) + shortcut_shallow # 64
         a_decoder = self.a_decoder_upscale4(a_decoder) # 1
         
-        alpha_estimation = torch.cat((raw, torch.unsqueeze(t_argmax, dim=1).float() / 2, a_decoder), dim=1)
-        # alpha_estimation = torch.cat((raw, t_decoder, a_decoder), dim=1)
+        # alpha_estimation = torch.cat((raw, torch.unsqueeze(t_argmax, dim=1).float() / 2, a_decoder), dim=1)
+        alpha_estimation = torch.cat((raw, t_decoder, a_decoder), dim=1)
         # alpha_estimation = self.propunit(alpha_estimation)
         alpha_estimation = self.prop_unit(alpha_estimation)
 
