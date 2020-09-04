@@ -141,7 +141,11 @@ def train(args, logger, device_ids):
         torch.set_grad_enabled(False)
         model.eval()
         with tqdm(total=len(valid_loader)) as pbar:
-            for index, (display_rgb, inputs, gts) in enumerate(valid_loader):
+            for index, batch in enumerate(valid_loader):
+                display_rgb = Variable(batch[0])
+                inputs = Variable(batch[1])
+                gts = Variable(batch[2])
+                
                 inputs = inputs.to(device) # [bs, 4, 320, 320]
                 gt_alpha = (gts[:, 0, :, :].unsqueeze(1)).type(torch.FloatTensor).to(device) # [bs, 1, 320, 320]
                 gt_trimap = gts[:, 1, :, :].type(torch.LongTensor).to(device) # [bs, 320, 320]
@@ -208,7 +212,7 @@ def train(args, logger, device_ids):
 def test(args, logger, device_ids):
     logger.info("Loading network")
     model = AdaMatting(in_channel=4)
-    ckpt = torch.load("/data/datasets/im/AdaMatting/ckpt_best_alpha.tar")
+    ckpt = torch.load("/home/user/samsung/Output/ckpts/ckpt_best_alpha.tar")
     model.load_state_dict(ckpt["state_dict"])
     if args.cuda:
         device = torch.device("cuda:{}".format(device_ids[0]))
