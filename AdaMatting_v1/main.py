@@ -1,7 +1,7 @@
 import os
 import torch
 import torchvision
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 from tqdm import tqdm
 import cv2 as cv
 from torchvision import transforms
@@ -18,7 +18,7 @@ from net.sync_batchnorm import convert_model
 from torch.autograd import Variable
 
 def train(args, logger, device_ids):
-    writer = SummaryWriter()
+    # writer = SummaryWriter()
 
     logger.info("Loading network")
     model = AdaMatting(in_channel=4)
@@ -119,12 +119,12 @@ def train(args, logger, device_ids):
             if cur_iter % 10 == 0:
                 logger.info("Epoch: {:03d} | Iter: {:05d}/{} | Loss: {:.4e} | L_t: {:.4e} | L_a: {:.4e}"
                             .format(epoch, index, len(train_loader), avg_lo.avg, avg_lt.avg, avg_la.avg))
-                writer.add_scalar("loss/L_overall", avg_lo.avg, tensorboard_iter)
-                writer.add_scalar("loss/L_t", avg_lt.avg, tensorboard_iter)
-                writer.add_scalar("loss/L_a", avg_la.avg, tensorboard_iter)
-                writer.add_scalar("other/sigma_t", sigma_t.item(), tensorboard_iter)
-                writer.add_scalar("other/sigma_a", sigma_a.item(), tensorboard_iter)
-                writer.add_scalar("other/lr", cur_lr, tensorboard_iter)
+                # writer.add_scalar("loss/L_overall", avg_lo.avg, tensorboard_iter)
+                # writer.add_scalar("loss/L_t", avg_lt.avg, tensorboard_iter)
+                # writer.add_scalar("loss/L_a", avg_la.avg, tensorboard_iter)
+                # writer.add_scalar("other/sigma_t", sigma_t.item(), tensorboard_iter)
+                # writer.add_scalar("other/sigma_a", sigma_a.item(), tensorboard_iter)
+                # writer.add_scalar("other/lr", cur_lr, tensorboard_iter)
 
                 avg_lo.reset()
                 avg_lt.reset()
@@ -159,42 +159,42 @@ def train(args, logger, device_ids):
                 avg_l_t.update(L_t_valid.item())
                 avg_l_a.update(L_a_valid.item())
 
-                if index == 0:
-                    input_rbg = torchvision.utils.make_grid(display_rgb, normalize=False, scale_each=True)
-                    writer.add_image('input/rbg_image', input_rbg, tensorboard_iter)
+                # if index == 0:
+                #     input_rbg = torchvision.utils.make_grid(display_rgb, normalize=False, scale_each=True)
+                #     writer.add_image('input/rbg_image', input_rbg, tensorboard_iter)
 
-                    input_trimap = inputs[:, 3, :, :].unsqueeze(dim=1)
-                    input_trimap = torchvision.utils.make_grid(input_trimap, normalize=False, scale_each=True)
-                    writer.add_image('input/trimap', input_trimap, tensorboard_iter)
+                #     input_trimap = inputs[:, 3, :, :].unsqueeze(dim=1)
+                #     input_trimap = torchvision.utils.make_grid(input_trimap, normalize=False, scale_each=True)
+                #     writer.add_image('input/trimap', input_trimap, tensorboard_iter)
 
-                    output_alpha = alpha_estimation.clone()
-                    output_alpha[t_argmax.unsqueeze(dim=1) == 0] = 0.0
-                    output_alpha[t_argmax.unsqueeze(dim=1) == 2] = 1.0
-                    output_alpha = torchvision.utils.make_grid(output_alpha, normalize=False, scale_each=True)
-                    writer.add_image('output/alpha', output_alpha, tensorboard_iter)
+                #     output_alpha = alpha_estimation.clone()
+                #     output_alpha[t_argmax.unsqueeze(dim=1) == 0] = 0.0
+                #     output_alpha[t_argmax.unsqueeze(dim=1) == 2] = 1.0
+                #     output_alpha = torchvision.utils.make_grid(output_alpha, normalize=False, scale_each=True)
+                #     writer.add_image('output/alpha', output_alpha, tensorboard_iter)
 
-                    trimap_adaption_res = (t_argmax.type(torch.FloatTensor) / 2).unsqueeze(dim=1)
-                    trimap_adaption_res = torchvision.utils.make_grid(trimap_adaption_res, normalize=False, scale_each=True)
-                    writer.add_image('pred/trimap_adaptation', trimap_adaption_res, tensorboard_iter)
+                #     trimap_adaption_res = (t_argmax.type(torch.FloatTensor) / 2).unsqueeze(dim=1)
+                #     trimap_adaption_res = torchvision.utils.make_grid(trimap_adaption_res, normalize=False, scale_each=True)
+                #     writer.add_image('pred/trimap_adaptation', trimap_adaption_res, tensorboard_iter)
 
-                    alpha_estimation_res = torchvision.utils.make_grid(alpha_estimation, normalize=False, scale_each=True)
-                    writer.add_image('pred/alpha_estimation', alpha_estimation_res, tensorboard_iter)
+                #     alpha_estimation_res = torchvision.utils.make_grid(alpha_estimation, normalize=False, scale_each=True)
+                #     writer.add_image('pred/alpha_estimation', alpha_estimation_res, tensorboard_iter)
 
-                    gt_alpha = torchvision.utils.make_grid(gt_alpha, normalize=False, scale_each=True)
-                    writer.add_image('gt/alpha', gt_alpha, tensorboard_iter)
+                #     gt_alpha = torchvision.utils.make_grid(gt_alpha, normalize=False, scale_each=True)
+                #     writer.add_image('gt/alpha', gt_alpha, tensorboard_iter)
 
-                    gt_trimap = (gt_trimap.type(torch.FloatTensor) / 2).unsqueeze(dim=1)
-                    gt_trimap = torchvision.utils.make_grid(gt_trimap, normalize=False, scale_each=True)
-                    writer.add_image('gt/trimap', gt_trimap, tensorboard_iter)
+                #     gt_trimap = (gt_trimap.type(torch.FloatTensor) / 2).unsqueeze(dim=1)
+                #     gt_trimap = torchvision.utils.make_grid(gt_trimap, normalize=False, scale_each=True)
+                #     writer.add_image('gt/trimap', gt_trimap, tensorboard_iter)
                     
                 pbar.update()
 
         logger.info("Average loss overall: {:.4e}".format(avg_loss.avg))
         logger.info("Average loss of trimap adaptation: {:.4e}".format(avg_l_t.avg))
         logger.info("Average loss of alpha estimation: {:.4e}".format(avg_l_a.avg))
-        writer.add_scalar("valid_loss/L_overall", avg_loss.avg, tensorboard_iter)
-        writer.add_scalar("valid_loss/L_t", avg_l_t.avg, tensorboard_iter)
-        writer.add_scalar("valid_loss/L_a", avg_l_a.avg, tensorboard_iter)
+        # writer.add_scalar("valid_loss/L_overall", avg_loss.avg, tensorboard_iter)
+        # writer.add_scalar("valid_loss/L_t", avg_l_t.avg, tensorboard_iter)
+        # writer.add_scalar("valid_loss/L_a", avg_l_a.avg, tensorboard_iter)
 
         is_best = avg_loss.avg < best_loss
         best_loss = min(avg_loss.avg, best_loss)
@@ -206,7 +206,7 @@ def train(args, logger, device_ids):
             save_checkpoint(ckpt_path=args.raw_data_path, is_best=is_best, is_alpha_best=is_alpha_best, logger=logger, model=model, optimizer=optimizer, 
                             epoch=epoch, cur_iter=cur_iter, peak_lr=peak_lr, best_loss=best_loss, best_alpha_loss=best_alpha_loss)
 
-    writer.close()
+    # writer.close()
 
 
 def test(args, logger, device_ids):
