@@ -72,7 +72,7 @@ def train(args, logger, device_ids):
         best_alpha_loss = float('inf')
 
     max_iter = 43100 * (1 - args.valid_portion / 100) / args.batch_size * args.epochs
-    tensorboard_iter = cur_iter * (args.batch_size / 16)
+    # tensorboard_iter = cur_iter * (args.batch_size / 16)
 
     avg_lo = AverageMeter()
     avg_lt = AverageMeter()
@@ -109,7 +109,7 @@ def train(args, logger, device_ids):
             clip_gradient(optimizer, 5)
             optimizer.step()
 
-            del inputs, gts, trimap_adaption, t_argmax, alpha_estimation
+            del inputs, gts, trimap_adaption, t_argmax, alpha_estimation, gt_alpha, gt_trimap
             torch.cuda.empty_cache()
 
             avg_lo.update(L_overall.item())
@@ -131,7 +131,7 @@ def train(args, logger, device_ids):
                 avg_la.reset()
                 
             cur_iter += 1
-            tensorboard_iter = cur_iter * (args.batch_size / 16)
+            # tensorboard_iter = cur_iter * (args.batch_size / 16)
 
         # Validation
         logger.info("Validating after the {}th epoch".format(epoch))
