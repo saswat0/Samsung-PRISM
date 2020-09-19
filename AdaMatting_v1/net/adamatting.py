@@ -40,10 +40,14 @@ class AdaMatting(nn.Module):
                 nn.init.xavier_normal_(m.weight)
                 nn.init.constant_(m.bias, 0)
         # Shortcuts
-        self.shortcut_shallow = self.shortcut_block(64, 64)
-        self.shortcut_middle_a = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
-        self.shortcut_middle_t = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
-        self.shortcut_deep = self.shortcut_block(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
+        self.shortcut_shallow = GCN(64, 64)
+        self.shortcut_middle_a = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        self.shortcut_middle_t = GCN(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        self.shortcut_deep = GCN(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
+        # self.shortcut_shallow = self.shortcut_block(64, 64)
+        # self.shortcut_middle_a = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        # self.shortcut_middle_t = self.shortcut_block(64 * Bottleneck.expansion, 64 * Bottleneck.expansion)
+        # self.shortcut_deep = self.shortcut_block(128 * Bottleneck.expansion, 128 * Bottleneck.expansion)
 
         # T-decoder
         self.t_decoder_upscale1 = nn.Sequential(
