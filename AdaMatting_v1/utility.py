@@ -114,7 +114,7 @@ def get_args():
     parser.add_argument('--valid_portion', type=int, required=True, help="percentage of valid data in all training samples")
     parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
     parser.add_argument('--epochs', type=int, default=20, help='number of epochs to train for')
-    parser.add_argument('--lr', type=float, default=0.001, help='Learning Rate. Default=0.01')
+    parser.add_argument('--lr', type=float, default=0.0001, help='Learning Rate. Default=0.0001')
     parser.add_argument('--decay_iters', type=int, help="Number of iterations every lr decay")
     parser.add_argument('--cuda', action='store_true', default=False, help='use cuda?')
     parser.add_argument('--gpu', type=str, default="0", help="choose gpus")
