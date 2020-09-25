@@ -57,6 +57,5 @@ def make_resblock(inplanes, planes, blocks, stride=1, block=Bottleneck):
     inplanes = planes * block.expansion
     for _ in range(1, blocks):
         layers.append(block(inplanes, planes))
-        inplanes = planes*block.expansion
 
     return nn.Sequential(*layers), inplanes
