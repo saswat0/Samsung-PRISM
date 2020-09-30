@@ -26,13 +26,13 @@ class AdaMatting(nn.Module):
         encoder_inplanes = 64
         self.encoder_maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.encoder_resblock1, encoder_inplanes = make_resblock(encoder_inplanes, 64, blocks=3, stride=2, block=Bottleneck)
-        self.encoder_resblock2, encoder_inplanes = make_resblock(encoder_inplanes, 128, blocks=3, stride=2, block=Bottleneck)
-        self.encoder_resblock3, encoder_inplanes = make_resblock(encoder_inplanes, 256, blocks=3, stride=2, block=Bottleneck)
+        self.encoder_resblock2, encoder_inplanes = make_resblock(encoder_inplanes, 128, blocks=4, stride=2, block=Bottleneck)
+        self.encoder_resblock3, encoder_inplanes = make_resblock(encoder_inplanes, 256, blocks=6, stride=2, block=Bottleneck)
         
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.xavier_normal_(m.weight)
-                nn.init.constant_(m.bias, 0)
+                # nn.init.constant_(m.bias, 0)
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
@@ -71,7 +71,7 @@ class AdaMatting(nn.Module):
             nn.PixelShuffle(2)
         )
 
-        # A-deocder
+        # A-decoder
         self.a_decoder_upscale1 = nn.Sequential(
             self.decoder_unit(256 * Bottleneck.expansion, 512 * 4),
             self.decoder_unit(512 * 4, 512 * 4),
